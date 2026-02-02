@@ -26,7 +26,7 @@
 dn-project/
 ├── backend/          # Spring Boot API 서버
 ├── frontend/         # React 웹 애플리케이션
-├── docs/             # 프로젝트 문서 및 설계 자료 ( [sql.txt](docs/sql.txt) )
+├── docs/             # 프로젝트 문서 및 설계 자료 ([sql.txt](docs/sql.txt))
 └── README.md         # 메인 설명 파일
 ```
 
