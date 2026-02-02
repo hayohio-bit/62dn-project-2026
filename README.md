@@ -1,6 +1,6 @@
-# 🐶 유기동물 입양/임보 AI 매칭 플랫폼 (62dn-project-2026)
+# 🐶 유기동물 입양/임보 매칭 플랫폼 (62dn-project-2026)
 
-이 프로젝트는 유기동물과 새로운 가족을 연결해주는 AI 기반 매칭 플랫폼입니다. 사용자 맞춤형 추천 시스템을 통해 유기동물 입양 및 임시 보호 활성화를 목표로 합니다.
+이 프로젝트는 유기동물과 새로운 가족을 연결해주는 입양/임보 매칭 플랫폼입니다. 사용자 맞춤형 추천 시스템을 통해 유기동물 입양 및 임시 보호 활성화를 목표로 합니다.
 
 ## 🛠 Tech Stack
 
@@ -37,28 +37,31 @@ dn-project/
 - Node.js 18 이상
 - MySQL 8.x 이상
 
-### Backend Setup
-1. `backend` 디렉토리로 이동합니다.
-2. `src/main/resources/application.properties` (또는 `.yml`)에서 데이터베이스 설정을 확인합니다.
-3. 다음 명령어를 실행하여 서버를 시작합니다:
-   ```bash
-   ./gradlew bootRun
-   ```
-4. Swagger UI: `http://localhost:8080/swagger-ui/index.html` 에서 API 명세를 확인할 수 있습니다.
+### 1. Repository Clone
+팀원들은 먼저 레포지토리를 클론합니다.
+```bash
+git clone https://github.com/hayohio-bit/62dn-project-2026.git
+cd 62dn-project-2026
+```
 
-### Frontend Setup
-1. `frontend` 디렉토리로 이동합니다.
-2. 의존성 패키지를 설치합니다:
-   ```bash
-   npm install
-   ```
-3. 로컬 개발 서버를 실행합니다:
-   ```bash
-   npm run dev
-   ```
-4. 브라우저에서 `http://localhost:5173` 으로 접속합니다.
+### 2. Environment Setup (.env)
+로컬 개발 환경 설정을 위해 각 디렉토리의 `.env.example` 파일을 복사하여 `.env` 파일을 생성합니다.
 
-### Database Setup
+#### Backend (`/backend`)
+1. `backend` 폴더로 이동합니다.
+2. `.env.example` 파일을 `.env`로 복사합니다.
+3. 데이터베이스 계정 정보 및 JWT 시크릿 키 등을 환경에 맞게 수정합니다.
+   - `DB_PASSWORD`: 본인의 MySQL 비밀번호
+   - `JWT_SECRET`: 최소 32자 이상의 임의 문자열
+
+#### Frontend (`/frontend`)
+1. `frontend` 폴더로 이동합니다.
+2. `.env.example` 파일을 `.env`로 복사합니다.
+3. 필요한 API 키를 설정합니다.
+   - `VITE_API_BASE_URL`: 백엔드 API 주소 (기본값: http://localhost:8080/api)
+   - `VITE_MAP_API_KEY`: [카카오 개발자 콘솔](https://developers.kakao.com/)에서 발급받은 JavaScript 키
+
+### 3. Database Setup
 1. MySQL 서버에 접속합니다.
 2. [docs/sql.txt](docs/sql.txt) 파일의 내용을 실행하여 데이터베이스(`DN_Platform`)와 필요한 테이블들을 생성합니다.
 
@@ -73,8 +76,28 @@ dn-project/
 | **volunteers** | 봉사 모집 및 신청 내역 관리 |
 | **donations** | 물품/현금 후원 신청 및 내역 관리 |
 
+### 4. Running the Application
+
+#### Backend Setup
+1. `backend` 디렉토리에서 다음 명령어를 실행하여 서버를 시작합니다:
+   ```bash
+   ./gradlew bootRun
+   ```
+2. Swagger UI: `http://localhost:8080/swagger-ui/index.html` 에서 API 명세를 확인할 수 있습니다.
+
+#### Frontend Setup
+1. `frontend` 디렉토리에서 의존성 패키지를 설치합니다:
+   ```bash
+   npm install
+   ```
+2. 로컬 개발 서버를 실행합니다:
+   ```bash
+   npm run dev
+   ```
+3. 브라우저에서 `http://localhost:5173` 으로 접속합니다.
+
 ## ✨ Key Features
-- **AI 매칭**: 설문 데이터를 기반으로 사용자에게 가장 적합한 유기동물 추천
+- **맞춤형 추천**: 설문 데이터를 기반으로 사용자에게 가장 적합한 유기동물 추천
 - **입양/임보 관리**: 입양 신청 및 승인 프로세스 관리
 - **성공 사례**: 실제 입양 성공 사례 공유 및 커뮤니티
 - **반응형 디자인**: 모바일과 데스크탑 모두 최적화된 UX/UI
