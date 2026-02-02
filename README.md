@@ -26,7 +26,7 @@
 dn-project/
 ├── backend/          # Spring Boot API 서버
 ├── frontend/         # React 웹 애플리케이션
-├── docs/             # 프로젝트 문서 및 설계 자료
+├── docs/             # 프로젝트 문서 및 설계 자료 ( [sql.txt](docs/sql.txt) )
 └── README.md         # 메인 설명 파일
 ```
 
@@ -57,6 +57,11 @@ dn-project/
    npm run dev
    ```
 4. 브라우저에서 `http://localhost:5173` 으로 접속합니다.
+
+### Database Setup
+1. MySQL 서버에 접속합니다.
+2. `docs/sql.txt` 파일의 내용을 실행하여 데이터베이스(`DN_Platform`)와 필요한 테이블들을 생성합니다.
+   - 주요 테이블: `users`, `animals`, `shelters`, `adoptions`, `boards`, `volunteers`, `donations` 등
 
 ## ✨ Key Features
 - **AI 매칭**: 설문 데이터를 기반으로 사용자에게 가장 적합한 유기동물 추천
