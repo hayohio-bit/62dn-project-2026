@@ -60,8 +60,18 @@ dn-project/
 
 ### Database Setup
 1. MySQL 서버에 접속합니다.
-2. `docs/sql.txt` 파일의 내용을 실행하여 데이터베이스(`DN_Platform`)와 필요한 테이블들을 생성합니다.
-   - 주요 테이블: `users`, `animals`, `shelters`, `adoptions`, `boards`, `volunteers`, `donations` 등
+2. [docs/sql.txt](docs/sql.txt) 파일의 내용을 실행하여 데이터베이스(`DN_Platform`)와 필요한 테이블들을 생성합니다.
+
+#### 주요 테이블 명세
+| 테이블명 | 설명 |
+| :--- | :--- |
+| **users** | 회원 정보 및 권한 (USER, MANAGER) 관리 |
+| **animals** | 보호 중인 유기동물 상세 프로필 (공공데이터 API 연동) |
+| **shelters** | 보호소 정보 및 담당 관리자 매칭 |
+| **adoptions** | 입양 및 임시보호 신청/승인 프로세스 관리 |
+| **boards** | 자유게시판, 공지사항, 입양 후기 등 커뮤니티 |
+| **volunteers** | 봉사 모집 및 신청 내역 관리 |
+| **donations** | 물품/현금 후원 신청 및 내역 관리 |
 
 ## ✨ Key Features
 - **AI 매칭**: 설문 데이터를 기반으로 사용자에게 가장 적합한 유기동물 추천
