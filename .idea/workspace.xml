@@ -87,11 +87,18 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1770012134218</updated>
-      <workItem from="1770012135900" duration="2466000" />
+      <workItem from="1770012135900" duration="3321000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+    <option name="exactExcludedFiles">
+      <list>
+        <option value="$PROJECT_DIR$/frontend/vite.config.js" />
+        <option value="$PROJECT_DIR$/frontend/src/main.jsx" />
+        <option value="$PROJECT_DIR$/frontend/src/App.jsx" />
+      </list>
+    </option>
   </component>
 </project>
