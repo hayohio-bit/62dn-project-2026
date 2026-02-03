@@ -6,6 +6,9 @@
   <component name="ChangeListManager">
     <list default="true" id="f93dc274-6703-4271-9f81-2d29f87a654e" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/dnproject/platform/domain/Adoption.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/dnproject/platform/domain/Adoption.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/dnproject/platform/domain/Animal.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/dnproject/platform/domain/Animal.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/dnproject/platform/domain/AnimalImage.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/dnproject/platform/domain/AnimalImage.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -31,6 +34,7 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Task" />
+        <option value="Class" />
       </list>
     </option>
   </component>
@@ -76,7 +80,7 @@
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "cjoh",
+    "git-widget-placeholder": "shy",
     "javascript.preferred.runtime.type.id": "node",
     "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",
@@ -167,6 +171,7 @@
       <workItem from="1770012135900" duration="7396000" />
       <workItem from="1770020397559" duration="1982000" />
       <workItem from="1770022951848" duration="436000" />
+      <workItem from="1770091333292" duration="4741000" />
     </task>
     <servers />
   </component>

@@ -31,7 +31,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User {
+public class User extends BaseTimeEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -60,6 +60,8 @@ public class User {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+    // 임시 비밀번호 여부를 위한 상태 값
+    private boolean isTemporaryPassword = false;
 
     // 비즈니스 메소드 : 비밀번호 변경
     public void updatePassword(String newPassword){
