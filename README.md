@@ -51,13 +51,14 @@ cd 62dn-project-2026
 1. `backend` 폴더로 이동합니다.
 2. `.env.example` 파일을 `.env`로 복사합니다.
 3. 데이터베이스 계정 정보 및 JWT 시크릿 키 등을 환경에 맞게 수정합니다.
+   - `DB_USERNAME`: 본인의 MySQL 계정 (기본값: root)
    - `DB_PASSWORD`: 본인의 MySQL 비밀번호
    - `JWT_SECRET`: 최소 32자 이상의 임의 문자열
 
 #### Frontend (`/frontend`)
 1. `frontend` 폴더로 이동합니다.
 2. `.env.example` 파일을 `.env`로 복사합니다.
-3. 필요한 API 키를 설정합니다.
+3. 필요한 API 키를 설정합니다. (상세 내용은 [프론트엔드 연동 가이드](frontend/API_INTEGRATION_GUIDE.md) 참고)
    - `VITE_API_BASE_URL`: 백엔드 API 주소 (기본값: http://localhost:8080/api)
    - `VITE_MAP_API_KEY`: [카카오 개발자 콘솔](https://developers.kakao.com/)에서 발급받은 JavaScript 키
 
@@ -66,6 +67,8 @@ cd 62dn-project-2026
 2. [docs/sql.txt](docs/sql.txt) 파일의 내용을 실행하여 데이터베이스(`DN_Platform`)와 필요한 테이블들을 생성합니다.
 
 #### 주요 테이블 명세
+전체 테이블 구조는 [docs/sql.txt](docs/sql.txt)에서 확인할 수 있습니다. (총 15개 테이블)
+
 | 테이블명 | 설명 |
 | :--- | :--- |
 | **users** | 회원 정보 및 권한 (USER, MANAGER) 관리 |
@@ -75,6 +78,7 @@ cd 62dn-project-2026
 | **boards** | 자유게시판, 공지사항, 입양 후기 등 커뮤니티 |
 | **volunteers** | 봉사 모집 및 신청 내역 관리 |
 | **donations** | 물품/현금 후원 신청 및 내역 관리 |
+| **...** | 알림, 댓글, 이미지, 동기화 로그 등 |
 
 ### 4. Running the Application
 
