@@ -6,6 +6,8 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "shelters")
@@ -64,6 +66,11 @@ public class Shelter extends BaseTimeEntity{
     @Column(name = "verified_at")
     private LocalDateTime verifiedAt;
 
+    @OneToMany(mappedBy = "shelter")
+    private List<Volunteer> volunteers = new ArrayList<>();
+
+    @OneToMany(mappedBy = "shelter")
+    private List<VolunteerRecruitment> volunteerRecruitments = new ArrayList<>();
 
 
 
