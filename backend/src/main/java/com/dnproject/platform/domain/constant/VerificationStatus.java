@@ -1,4 +1,5 @@
 package com.dnproject.platform.domain.constant;
 
 public enum VerificationStatus {
+    PENDING, APPROVED, REJECTED;
 }
