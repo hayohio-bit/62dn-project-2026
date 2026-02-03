@@ -71,12 +71,19 @@
 .toss-header-inner {
   max-width: var(--toss-container);
   margin: 0 auto;
-  padding: 0 var(--toss-space-6);
+  padding: 0 var(--toss-space-3);
   height: 100%;
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
-  gap: var(--toss-space-4);
+  gap: var(--toss-space-2);
+}
+
+@media (min-width: 768px) {
+  .toss-header-inner {
+    padding: 0 var(--toss-space-6);
+    gap: var(--toss-space-4);
+  }
 }
 
 .toss-logo {
@@ -90,13 +97,20 @@
   align-items: center;
   gap: var(--toss-space-2);
   justify-self: start;
+  flex-shrink: 0;
 }
 
 .toss-logo-img {
-  height: 3rem;
+  height: 2rem;
   width: auto;
   display: block;
   object-fit: contain;
+}
+
+@media (min-width: 768px) {
+  .toss-logo-img {
+    height: 3rem;
+  }
 }
 
 .toss-nav {
@@ -124,18 +138,31 @@
   align-items: center;
   justify-content: center;
   font-weight: var(--toss-font-semibold);
-  font-size: var(--toss-text-caption);
+  font-size: 0.75rem;
   border-radius: var(--toss-radius);
   transition: background-color 0.15s ease, transform 0.1s ease;
   cursor: pointer;
   border: none;
   text-decoration: none;
+  white-space: nowrap;
+}
+
+@media (min-width: 768px) {
+  .toss-btn {
+    font-size: var(--toss-text-caption);
+  }
 }
 
 .toss-btn-primary {
   background-color: var(--toss-blue);
   color: var(--toss-white);
-  padding: 0.625rem 1.25rem;
+  padding: 0.5rem 0.75rem;
+}
+
+@media (min-width: 768px) {
+  .toss-btn-primary {
+    padding: 0.625rem 1.25rem;
+  }
 }
 
 .toss-btn-primary:hover {
@@ -145,7 +172,13 @@
 .toss-btn-ghost {
   background-color: transparent;
   color: var(--toss-gray-700);
-  padding: 0.5rem 0.75rem;
+  padding: 0.375rem 0.5rem;
+}
+
+@media (min-width: 768px) {
+  .toss-btn-ghost {
+    padding: 0.5rem 0.75rem;
+  }
 }
 
 .toss-btn-ghost:hover {
@@ -156,6 +189,15 @@
 /* 우측 액션 영역을 grid 오른쪽으로 정렬 */
 .toss-header-inner > .flex {
   justify-self: end;
+  flex-shrink: 0;
+  min-width: 0;
+}
+
+/* 모바일에서 버튼 간격 줄이기 */
+@media (max-width: 767px) {
+  .toss-header-inner > .flex {
+    gap: 0.375rem;
+  }
 }
 
 /* 히어로 - 전체 폭 블루 배경, 흰 글씨, 큰 제목 */

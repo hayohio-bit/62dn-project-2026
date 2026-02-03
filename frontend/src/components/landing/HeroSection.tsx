@@ -5,6 +5,15 @@ import { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 const TRANSITION_MS = 700;
 
 export default function HeroSection() {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   const slides = useMemo(
     () => [
       {
@@ -136,27 +145,51 @@ export default function HeroSection() {
     return () => window.clearInterval(id);
   }, [isPlaying, logicalIndex, goTo]);
 
-  const onDragEnd = (_: unknown, info: PanInfo) => {
-    const threshold = 50;
-    const velocity = info.velocity.x;
-    const offset = info.offset.x;
-    if (velocity < -threshold || offset < -80) {
-      goTo((logicalIndex + 1) % 3);
-    } else if (velocity > threshold || offset > 80) {
-      goTo((logicalIndex + 2) % 3);
+  const onPanEnd = (_: unknown, info: PanInfo) => {
+    // 세로 스크롤이 우선이므로, 수평 이동이 명확할 때만 슬라이드 전환
+    const absX = Math.abs(info.offset.x);
+    const absY = Math.abs(info.offset.y);
+
+    // 세로 스크롤이 더 크면 슬라이드 전환 안 함
+    if (absY > absX) return;
+
+    if (isMobile) {
+      // 모바일: 간단한 스와이프 감지
+      if (info.offset.x < -60) {
+        goTo((logicalIndex + 1) % 3);
+      } else if (info.offset.x > 60) {
+        goTo((logicalIndex + 2) % 3);
+      }
+    } else {
+      // 데스크톱: 드래그 감지
+      const threshold = 50;
+      const velocity = info.velocity.x;
+      const offset = info.offset.x;
+      if (velocity < -threshold || offset < -80) {
+        goTo((logicalIndex + 1) % 3);
+      } else if (velocity > threshold || offset > 80) {
+        goTo((logicalIndex + 2) % 3);
+      }
     }
   };
 
   return (
-    <section className="landing-hero landing-hero--carousel" aria-label="메인 소개">
+    <section className="landing-hero landing-hero--carousel" aria-label="메인 소개" style={{ touchAction: 'pan-y' }}>
       <div className="landing-hero-carousel">
         <motion.div
           className="landing-hero-track"
-          drag="x"
+          drag={isMobile ? false : "x"}
           dragConstraints={{ left: 0, right: 0 }}
-          dragElastic={0.15}
-          onDragEnd={onDragEnd}
-          style={{ '--hero-active-index': displayIndex } as React.CSSProperties}
+          dragElastic={0.08}
+          dragMomentum={false}
+          onDragEnd={isMobile ? undefined : onPanEnd}
+          onPanEnd={isMobile ? onPanEnd : undefined}
+          style={{
+            '--hero-active-index': displayIndex,
+            touchAction: 'pan-y',
+            userSelect: 'none',
+            WebkitUserSelect: 'none',
+          } as React.CSSProperties}
         >
           {extendedSlides.map((slide, i) => (
             <article

@@ -41,9 +41,18 @@
 .landing-section {
   padding-top: var(--landing-section-pad);
   padding-bottom: var(--landing-section-pad);
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
   background-color: transparent;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (min-width: 768px) {
+  .landing-section {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
 }
 
 .landing-inner {
@@ -80,7 +89,7 @@
 .landing-section-row {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 2rem;
+  gap: 1.5rem;
   align-items: center;
   max-width: var(--landing-container);
   margin: 0 auto;
@@ -101,10 +110,12 @@
 
 .landing-section-content {
   min-width: 0;
+  touch-action: pan-y;
 }
 
 .landing-section-visual {
   min-width: 0;
+  touch-action: pan-y;
 }
 
 /* 2컬럼 섹션에서 쓰는 "이미지 자리" (실제 이미지는 추후 삽입) */
@@ -172,13 +183,21 @@
   justify-content: center;
   font-family: var(--landing-font);
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 0.875rem;
   border-radius: var(--landing-radius);
-  padding: 0.875rem 1.75rem;
+  padding: 0.625rem 1rem;
   text-decoration: none;
   transition: background-color 0.2s, transform 0.1s;
   border: none;
   cursor: pointer;
+  white-space: nowrap;
+}
+
+@media (min-width: 768px) {
+  .landing-btn {
+    font-size: 1rem;
+    padding: 0.875rem 1.75rem;
+  }
 }
 
 .landing-btn-primary {
@@ -211,6 +230,8 @@
   overflow: hidden;
   /* 모바일: 터치 시 문서 세로 스크롤로 전달 */
   touch-action: pan-y;
+  /* iOS Safari 스크롤 개선 */
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Apple 스타일 사이드 슬라이드 캐러셀 */
@@ -219,6 +240,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
+  touch-action: pan-y;
 }
 
 .landing-hero-carousel {
@@ -230,10 +252,11 @@
   overflow: hidden;
   padding-top: 6.5rem;
   padding-bottom: 1rem;
+  touch-action: pan-y;
 }
 
 .landing-hero-track {
-  /* 슬라이드 폭: 뷰포트 기준 72% (한 개만 중앙, 양옆 14%씩 peek) */
+  /* 슬라이드 폭: 뷰포트 기준 72% (한 개만 중앙,양옆 14%씩 peek) */
   --hero-slide-width: 72vw;
   --hero-gap: 1rem;
   --hero-offset: calc(var(--hero-slide-width) + var(--hero-gap));
@@ -243,10 +266,25 @@
   transition: transform 0.7s cubic-bezier(0.25, 0.1, 0.25, 1);
   transform: translateX(calc(14vw - var(--hero-active-index, 0) * var(--hero-offset)));
   cursor: grab;
+  /* 모바일에서는 세로 스크롤 우선 */
+  touch-action: pan-y;
+}
+
+@media (max-width: 767px) {
+  .landing-hero-track {
+    cursor: default;
+    /* 모바일: 드래그 커서 제거 */
+  }
 }
 
 .landing-hero-track:active {
   cursor: grabbing;
+}
+
+@media (max-width: 767px) {
+  .landing-hero-track:active {
+    cursor: default;
+  }
 }
 
 .landing-hero-track--no-transition {
@@ -800,6 +838,8 @@
   padding-top: var(--landing-section-pad);
   padding-bottom: var(--landing-section-pad);
   border-top: 1px solid var(--landing-gray-100);
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
 }
 
 .landing-final-cta .landing-section-title {
@@ -837,16 +877,27 @@
 /* 통계 섹션 (별도 섹션으로 분리) */
 .landing-stats {
   background-color: var(--landing-gray-100);
-  padding-top: 2.5rem;
-  padding-bottom: 2.5rem;
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (min-width: 768px) {
+  .landing-stats {
+    padding-top: 2.5rem;
+    padding-bottom: 2.5rem;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
 }
 
 .landing-stats-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1.25rem;
+  gap: 1rem;
   max-width: var(--landing-container);
   margin: 0 auto;
   text-align: center;
@@ -855,13 +906,14 @@
 @media (min-width: 640px) {
   .landing-stats-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 2rem;
+    gap: 1.5rem;
   }
 }
 
 @media (min-width: 960px) {
   .landing-stats-grid {
     grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
   }
 }
 
