@@ -18,10 +18,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,13 +50,9 @@ public class User extends BaseTimeEntity{
     @Column(nullable = false, length = 20)
     private Role role;
 
-    @CreationTimestamp
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
+    @OneToMany(mappedBy = "user")
+    private List<Volunteer> volunteers = new ArrayList<>();
 
-    @UpdateTimestamp
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
     // 임시 비밀번호 여부를 위한 상태 값
     private boolean isTemporaryPassword = false;
 
@@ -67,5 +60,5 @@ public class User extends BaseTimeEntity{
     public void updatePassword(String newPassword){
         this.password = newPassword;
     }
-
 }
+
