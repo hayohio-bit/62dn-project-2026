@@ -1,49 +1,59 @@
-# 로컬에서 아래 내용을 .gitignore 파일로 생성
-cat > .gitignore << 'EOF'
+# ==========================
 # Node (Frontend)
+# ==========================
 node_modules/
 dist/
 build/
-.env.local
-.env.*.local
 npm-debug.log*
 yarn-debug.log*
-.DS_Store
+.env.local
+.env.*.local
 
-# Java (Backend)
+# ==========================
+# Java / Spring Boot (Backend)
+# ==========================
 target/
 *.class
 *.jar
 *.war
-.idea/
-*.iml
-*.iws
-*.ipr
-.classpath
-.project
-.settings/
 bin/
-.vscode/
 
-# Environment
+# ==========================
+# Gradle
+# ==========================
+.gradle/
+build/
+
+# ==========================
+# Environment & Config
+# ==========================
 .env
 .env.dev
 .env.prod
 application-local.yml
 application-dev.yml
 
-# OS
-.DS_Store
-Thumbs.db
-
-# IDE
-.vscode/
+# ==========================
+# IDEs & Editors
+# ==========================
 .idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
 *.swp
 *.swo
 *~
 
+# ==========================
 # Logs
+# ==========================
 *.log
 logs/
-EOF
+out/
+
+# ==========================
+# OS
+# ==========================
+.DS_Store
+Thumbs.db
