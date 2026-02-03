@@ -22,6 +22,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -51,6 +53,13 @@ public class User extends BaseTimeEntity{
     @Column(nullable = false, length = 20)
     private Role role;
 
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
     // 임시 비밀번호 여부를 위한 상태 값
     private boolean isTemporaryPassword = false;
 
