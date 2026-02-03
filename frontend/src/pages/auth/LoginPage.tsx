@@ -11,6 +11,36 @@ const STORAGE_REMEMBER_EMAIL = 'login_remember_email';
 const STORAGE_REMEMBER_PASSWORD = 'login_remember_password';
 const STORAGE_KEEP_LOGGED_IN = 'login_keep_logged_in';
 
+// 구글 로그인
+const handleGoogleLogin = () => {
+  const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+  const redirectUri = import.meta.env.VITE_GOOGLE_REDIRECT_URI;
+
+  const url =
+      `https://accounts.google.com/o/oauth2/v2/auth` +
+      `?client_id=${clientId}` +
+      `&redirect_uri=${encodeURIComponent(redirectUri)}` +
+      `&response_type=code` +
+      `&scope=openid email profile`;
+
+  window.location.href = url;
+};
+
+
+// 카카오 로그인
+const handleKakaoLogin = () => {
+  const clientId = import.meta.env.VITE_KAKAO_REST_API_KEY;
+  const redirectUri = import.meta.env.VITE_KAKAO_REDIRECT_URI;
+
+  const kakaoAuthUrl =
+      `https://kauth.kakao.com/oauth/authorize` +
+      `?client_id=${clientId}` +
+      `&redirect_uri=${encodeURIComponent(redirectUri)}` +
+      `&response_type=code`;
+
+  window.location.href = kakaoAuthUrl;
+};
+
 function loadSavedCredentials() {
   try {
     const savedEmail = localStorage.getItem(STORAGE_EMAIL);
@@ -189,6 +219,43 @@ export default function LoginPage() {
 
           <button type="submit" disabled={loading} className="toss-auth-submit">
             {loading ? '로그인 중...' : '로그인'}
+          </button>
+
+          <button
+              type="button"
+              onClick={handleGoogleLogin}
+              className="toss-auth-submit"
+              style={{
+                backgroundColor: '#ffffff',
+                color: '#1f1f1f',
+                border: '1px solid #ddd',
+                marginTop: '12px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+              }}
+          >
+            <img
+                src="https://developers.google.com/identity/images/g-logo.png"
+                alt="google"
+                style={{ width: 18, height: 18 }}
+            />
+            Google로 로그인
+          </button>
+
+
+          <button
+              type="button"
+              onClick={handleKakaoLogin}
+              className="toss-auth-submit"
+              style={{
+                backgroundColor: '#FEE500',
+                color: '#191919',
+                marginTop: '12px',
+              }}
+          >
+            카카오로 로그인
           </button>
 
           <p className="toss-auth-foot">

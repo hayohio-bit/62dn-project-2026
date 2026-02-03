@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class SyncHistory {
+public class SyncHistory extends BaseTimeEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,9 +22,6 @@ public class SyncHistory {
 
     @Enumerated(EnumType.STRING)
     private SyncTriggerType triggerType;
-
-    private LocalDateTime syncStartTime;
-    private LocalDateTime syncEndTime;
 
     private Integer totalCount;
     private Integer successCount;
