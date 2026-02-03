@@ -11,6 +11,7 @@ package com.dnproject.platform.domain;
     created_at TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP(6), -- 등록일
     updated_at TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), -- 수정일 (수정 시 자동 갱신)
 * */
+
 import com.dnproject.platform.domain.constant.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -57,6 +58,7 @@ public class User {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
 
     // 비즈니스 메소드 : 비밀번호 변경
     public void updatePassword(String newPassword){
