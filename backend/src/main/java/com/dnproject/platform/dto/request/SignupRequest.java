@@ -1,13 +1,16 @@
 package com.dnproject.platform.dto.request;
 
+import com.dnproject.platform.domain.User;
+import com.dnproject.platform.domain.constant.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
-@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class SignupRequest {
     @NotBlank(message = "이메일은 필수 입력값입니다.")
     @Email(message = "이메일 형식이 올바르지 않습니다.")
@@ -25,5 +28,16 @@ public class SignupRequest {
 
     private String phone;
     private String address;
+
+    public User toEntity(String encodedPassword, Role role) {
+        return User.builder()
+                .email(this.email)
+                .password(encodedPassword)
+                .name(this.name)
+                .phone(this.phone)
+                .address(this.address)
+                .role(role)
+                .build();
+    }
 
 }

@@ -20,6 +20,7 @@ import AdminDashboardPage from '@/pages/admin/AdminDashboardPage';
 import PlaceholderPage from '@/pages/PlaceholderPage';
 import GuideAdoptionPage from '@/pages/guide/GuideAdoptionPage';
 import GuideFosterPage from '@/pages/guide/GuideFosterPage';
+import GoogleCallback from "@/pages/auth/GoogleCallback.tsx";
 
 function App() {
   useProactiveRefresh();
@@ -50,7 +51,8 @@ function App() {
         
         {/* 인증 */}
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<SignupPage />} />
+          <Route path="/oauth/google" element={<GoogleCallback />} />
+          <Route path="/signup" element={<SignupPage />} />
         <Route path="/mypage" element={<MyPage />} />
         <Route path="/mypage/preferences" element={<PreferencePage />} />
         <Route path="/admin" element={<AdminDashboardPage />} />

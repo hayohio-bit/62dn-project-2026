@@ -7,15 +7,19 @@ package com.dnproject.platform.dto.response;
 
 import com.dnproject.platform.domain.User;
 import com.dnproject.platform.domain.constant.Role;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserResponse {
 
     // 보안 철칙 제 1장 패스워드는 응답하지 않는다. 왜 why? 로그가 남아버림
-//
+
     private Long id;
     private String email;
     private String name;
