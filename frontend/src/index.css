@@ -16,6 +16,8 @@ html {
   /* 모바일: 세로 스크롤만 허용, 터치가 특정 요소에 잡히지 않도록 */
   touch-action: pan-y;
   overflow-x: hidden;
+  /* iOS Safari 스크롤 개선 */
+  -webkit-overflow-scrolling: touch;
 }
 
 body {
@@ -27,8 +29,21 @@ body {
   background-color: var(--toss-white);
   touch-action: pan-y;
   overflow-x: hidden;
+  /* iOS Safari 스크롤 개선 */
+  -webkit-overflow-scrolling: touch;
+  /* 모바일 탭 하이라이트 제거 */
+  -webkit-tap-highlight-color: transparent;
 }
 
 #root {
   min-height: 100vh;
+  /* 세로 스크롤 우선 */
+  touch-action: pan-y;
+}
+
+/* 모든 주요 섹션에 세로 스크롤 우선 적용 */
+section,
+article,
+main {
+  touch-action: pan-y;
 }

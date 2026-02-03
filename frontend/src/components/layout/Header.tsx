@@ -62,7 +62,7 @@ export default function Header() {
     <header className={clsx('toss-header', hidden && 'toss-header--hidden')}>
       <div className="toss-header-inner">
         <Link to="/" className="toss-logo" aria-label="62댕냥 홈">
-          <img src="/logo-bk.webp" alt="62댕냥" className="toss-logo-img" width={180} height={48} />
+          <img src="/logo-bk.webp" alt="62댕냥" className="toss-logo-img" />
         </Link>
 
         <nav className="toss-nav hidden md:flex" aria-label="메인 메뉴">
@@ -73,16 +73,17 @@ export default function Header() {
           ))}
         </nav>
 
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex items-center gap-2 md:gap-3 shrink-0">
           {isAuthenticated ? (
             <>
               {(user?.role === 'SUPER_ADMIN' || user?.role === 'SHELTER_ADMIN') && (
-                <Link to="/admin" className="toss-btn toss-btn-ghost">
+                <Link to="/admin" className="toss-btn toss-btn-ghost hidden sm:inline-flex">
                   관리자
                 </Link>
               )}
               <Link to="/mypage" className="toss-btn toss-btn-ghost">
-                마이페이지
+                <span className="hidden sm:inline">마이페이지</span>
+                <span className="sm:hidden">마이</span>
               </Link>
               <button
                 type="button"

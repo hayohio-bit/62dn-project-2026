@@ -42,18 +42,26 @@ export default function StickyStackingSection({
   return (
     <motion.div
       className={`sticky w-full max-w-full overflow-x-hidden touch-pan-y ${className}`}
-      style={{ ...style, touchAction: 'pan-y' }}
-      initial={{ y: isMobile ? 28 : 72, opacity: 0.92 }}
+      style={{ ...style, touchAction: 'pan-y', WebkitOverflowScrolling: 'touch' }}
+      initial={isMobile ? { y: 16, opacity: 0.96 } : { y: 72, opacity: 0.92 }}
       whileInView={{ y: 0, opacity: 1 }}
-      viewport={{ once: true, amount: 0.08 }}
-      transition={{
-        type: 'spring',
-        stiffness: 110,
-        damping: 22,
-        mass: 0.55,
-      }}
+      viewport={{ once: true, amount: isMobile ? 0.05 : 0.08 }}
+      transition={
+        isMobile
+          ? {
+              type: 'tween',
+              duration: 0.35,
+              ease: 'easeOut',
+            }
+          : {
+              type: 'spring',
+              stiffness: 110,
+              damping: 22,
+              mass: 0.55,
+            }
+      }
     >
-      <div className="landing-stack-stage">
+      <div className="landing-stack-stage" style={{ touchAction: 'pan-y' }}>
         {children}
       </div>
     </motion.div>

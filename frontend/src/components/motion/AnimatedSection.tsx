@@ -53,6 +53,7 @@ export default function AnimatedSection({
         delay,
         ease: appleEase,
       }}
+      style={{ touchAction: 'pan-y' }}
     >
       {children}
     </motion.div>
