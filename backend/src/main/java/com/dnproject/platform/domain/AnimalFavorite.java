@@ -8,31 +8,25 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 
 @Entity
-@Table(name = "animal_images", indexes = {
-        @Index(name = "idx_animal_images_animal", columnList = "animal_id")
+@Table(name = "animal_favorites", indexes = {
+        @Index(name = "idx_favorites_user", columnList = "user_id"),
+        @Index(name = "uk_favorites_user_animal", columnList = "user_id, animal_id", unique = true)
 })
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class AnimalImage extends BaseTimeEntity {
+public class AnimalFavorite extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "animal_id", nullable = false)
     private Animal animal;
-
-    @Column(nullable = false, length = 500)
-    private String imageUrl;  // S3 URL
-
-    @Column(name = "is_main", columnDefinition = "BOOLEAN DEFAULT FALSE")
-    private Boolean isMain = false;  // 대표 이미지 여부 (하나만 true)
-
-    // 비즈니스 메서드
-    public void setAsMainImage() {
-        this.isMain = true;
-    }
 }
