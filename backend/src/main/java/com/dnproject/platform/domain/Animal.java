@@ -57,8 +57,7 @@ public class Animal extends BaseTimeEntity {  // auditing 상속
     private Integer age;  // 나이 (개월)
 
     @Column(length = 10)
-    @Enumerated(EnumType.STRING)
-    private Gender gender;  // 성별: M, F
+    private String gender;  // 성별: M, F
 
     @Enumerated(EnumType.STRING)
     @Column(length = 10)
@@ -87,7 +86,6 @@ public class Animal extends BaseTimeEntity {  // auditing 상속
 
     @Enumerated(EnumType.STRING)
     @Column(length = 20, nullable = false)
-    @Builder.Default
     private AnimalStatus status = AnimalStatus.PROTECTED;  // 상태: PROTECTED, ADOPTED 등
 
     private LocalDate registerDate;  // 접수일
@@ -104,4 +102,8 @@ public class Animal extends BaseTimeEntity {  // auditing 상속
     @OneToMany(mappedBy = "animal", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AnimalFavorite> favorites = new ArrayList<>();
 
+    // Enum 정의
+    public enum AnimalStatus {
+        PROTECTED, ADOPTED, FOSTERED, TRANSFERRED
+    }
 }
