@@ -1,47 +1,42 @@
 package com.dnproject.platform.dto.response;
 
 import com.dnproject.platform.domain.Animal;
-import com.dnproject.platform.domain.AnimalImage;
 import com.dnproject.platform.domain.constant.Size;
 import com.dnproject.platform.domain.constant.Species;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.time.LocalDate;
 
 @Getter
 @Builder
 @AllArgsConstructor
-public class AnimalResponse {
+public class AnimalListResponse {
     private Long id;
-    private String shelterName; // 엔티티엔 없지만 화면엔 필요함
     private String name;
     private Species species;
     private String breed;
-    private Integer age;
     private String gender;
     private Size size;
     private String status;
     private String imageUrl;
-    private List<String> detailImages; // AnimalImage 엔티티 리스트를 URL 리스트로 변환
+    private String orgName;   // 어느 지역/기관인지?
+    private LocalDate registerDate;
 
-    public static AnimalResponse from(Animal animal) {
-        return AnimalResponse.builder()
+    //Mapping
+    public static AnimalListResponse from(Animal animal) {
+        return AnimalListResponse.builder()
                 .id(animal.getId())
-                .shelterName(animal.getShelter().getName())
                 .name(animal.getName())
                 .species(animal.getSpecies())
                 .breed(animal.getBreed())
-                .age(animal.getAge())
                 .gender(animal.getGender())
                 .size(animal.getSize())
                 .status(animal.getStatus().name())
                 .imageUrl(animal.getImageUrl())
-                .detailImages(animal.getImages().stream()
-                        .map(AnimalImage::getImageUrl)
-                        .collect(Collectors.toList()))
+                .orgName(animal.getOrgName())
+                .registerDate(animal.getRegisterDate())
                 .build();
     }
 }
