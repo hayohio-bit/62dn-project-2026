@@ -14,14 +14,14 @@ import java.time.LocalDateTime;
 public class ShelterSignupResponse {
     private Long id;
     private String name;
-    private VerificationStatus status;
+    private String status;
     private LocalDateTime createdAt;
 
     public static ShelterSignupResponse from(Shelter shelter) {
         return ShelterSignupResponse.builder()
                 .id(shelter.getId())
                 .name(shelter.getName())
-                .status(shelter.getVerificationStatus())
+                .status(shelter.getVerificationStatus().getDescription())
                 .createdAt(shelter.getCreatedAt())
                 .build();
     }

@@ -5,6 +5,7 @@ import com.dnproject.platform.domain.DonationRequest;
 import com.dnproject.platform.domain.Shelter;
 import com.dnproject.platform.domain.User;
 import com.dnproject.platform.domain.constant.DonationType;
+import com.dnproject.platform.domain.constant.PaymentMethod;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,7 +38,7 @@ public class DonationApplyRequest {
     private String donorEmail;
 
     @NotBlank(message = "후원 종류는 필수입니다.")
-    private String donationType;
+    private DonationType donationType;
 
     @NotNull(message = "후원 금액(가치)은 필수입니다.")
     @DecimalMin(value = "0.0", inclusive = false, message = "후원 금액은 0보다 커야 합니다.")
@@ -49,7 +50,7 @@ public class DonationApplyRequest {
     private Integer quantity;
 
     @NotBlank(message = "결제/전달 방법은 필수입니다.")
-    private String paymentMethod;
+    private PaymentMethod paymentMethod;
 
     @NotNull(message = "영수증 신청 여부를 선택해주세요.")
     private Boolean receiptRequested;
@@ -63,7 +64,7 @@ public class DonationApplyRequest {
                 .donorName(donorName)
                 .donorPhone(donorPhone)
                 .donorEmail(donorEmail)
-                .donationType(DonationType.valueOf(this.donationType))
+                .donationType(donationType)
                 .amount(amount)
                 .itemName(itemName)
                 .quantity(quantity)
