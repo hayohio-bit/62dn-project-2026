@@ -20,6 +20,9 @@ public class ShelterSignupRequest {
     @NotBlank(message = "보호소 이름은 필수입니다.")
     private String name;
 
+    @NotBlank(message = "비밀번호는 필수입니다.")
+    private String password;
+
     @NotBlank(message = "보호소 주소는 필수입니다.")
     private String address;
 

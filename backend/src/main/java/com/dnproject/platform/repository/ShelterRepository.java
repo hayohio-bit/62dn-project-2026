@@ -1,4 +1,11 @@
 package com.dnproject.platform.repository;
 
-public interface ShelterRepository {
+import com.dnproject.platform.domain.Shelter;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ShelterRepository extends JpaRepository<Shelter, Long> {
+
+    boolean existsByBusinessRegistrationNumber(String businessRegistrationNumber);
+
+    boolean existsByEmail(String email);
 }
