@@ -10,7 +10,11 @@ import java.time.LocalDate;
 
 @Getter
 @Entity
-@Table(name = "volunteers")
+@Table(name = "volunteers", indexes = {
+    @Index(name = "idx_volunteers_user", columnList = "user_id"),
+    @Index(name = "idx_volunteers_shelter", columnList = "shelter_id"),
+    @Index(name = "idx_volunteers_date", columnList = "volunteer_date_start")
+})
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor

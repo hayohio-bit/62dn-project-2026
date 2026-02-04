@@ -10,7 +10,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "shelters")
+@Table(name = "shelters", indexes = {
+        @Index(name = "idx_shelters_name", columnList = "name"),
+        @Index(name = "idx_shelters_business_reg", columnList = "business_registration_number"),
+        @Index(name = "idx_shelters_verification", columnList = "verification_status")
+})
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
