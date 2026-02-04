@@ -18,7 +18,7 @@ public class ShelterResponse {
     private String phone;
     private String email;
     private String managerName;
-    private VerificationStatus status;
+    private String status;
     private LocalDateTime verifiedAt;
 
     public static ShelterResponse from(Shelter shelter) {
@@ -29,7 +29,7 @@ public class ShelterResponse {
                 .phone(shelter.getPhone())
                 .email(shelter.getEmail())
                 .managerName(shelter.getManagerName())
-                .status(shelter.getVerificationStatus())
+                .status(shelter.getVerificationStatus().getDescription())
                 .verifiedAt(shelter.getVerifiedAt())
                 .build();
     }

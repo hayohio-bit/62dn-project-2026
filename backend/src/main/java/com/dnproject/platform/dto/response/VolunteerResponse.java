@@ -34,12 +34,12 @@ public class VolunteerResponse {
     private LocalDate volunteerDateEnd;
     private ActivityCycle activityCycle;
     private String preferredTimeSlot;
-    private VolunteerType volunteerType;
+    private String volunteerType;
     private Integer participantCount;
 
     private String experience;
     private String specialNotes;
-    private VolunteerStatus volunteerStatus;
+    private String volunteerStatus;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -60,11 +60,11 @@ public class VolunteerResponse {
                 .volunteerDateStart(volunteer.getVolunteerDateStart())
                 .volunteerDateEnd(volunteer.getVolunteerDateEnd())
                 .preferredTimeSlot(volunteer.getPreferredTimeSlot())
-                .volunteerType(volunteer.getVolunteerType())
+                .volunteerType(volunteer.getVolunteerType().getDescription())
                 .participantCount(volunteer.getParticipantCount())
                 .experience(volunteer.getExperience())
                 .specialNotes(volunteer.getSpecialNotes())
-                .volunteerStatus(volunteer.getVolunteerStatus())
+                .volunteerStatus(volunteer.getVolunteerStatus().getDescription())
                 .createdAt(volunteer.getCreatedAt())
                 .updatedAt(volunteer.getUpdatedAt())
                 .build();

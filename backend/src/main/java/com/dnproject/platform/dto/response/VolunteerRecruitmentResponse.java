@@ -24,7 +24,7 @@ public class VolunteerRecruitmentResponse {
     private int maxApplicants;
     private int currenApplicants;
     private LocalDate deadline;
-    private RecruitmentStatus recruitmentStatus;
+    private String recruitmentStatus;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -40,7 +40,7 @@ public class VolunteerRecruitmentResponse {
                 .maxApplicants(recruitment.getMaxApplicants())
                 .currenApplicants(recruitment.getVolunteers() != null ? recruitment.getVolunteers().size() : 0)
                 .deadline(recruitment.getDeadline())
-                .recruitmentStatus(recruitment.getRecruitmentStatus())
+                .recruitmentStatus(recruitment.getRecruitmentStatus().getDescription())
                 .createdAt(recruitment.getCreatedAt())
                 .updatedAt(recruitment.getUpdatedAt())
                 .build();
