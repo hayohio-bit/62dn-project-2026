@@ -1,6 +1,6 @@
 package com.dnproject.platform;
 
-public class GitTest {
+public class JhyeonGitTest {
     public static void main(String[] args) {
         String test;
     }
