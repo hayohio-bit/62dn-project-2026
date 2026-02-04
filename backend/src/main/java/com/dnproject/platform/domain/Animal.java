@@ -1,5 +1,7 @@
 package com.dnproject.platform.domain;
 
+import com.dnproject.platform.domain.constant.Size;
+import com.dnproject.platform.domain.constant.Species;
 import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;
@@ -42,8 +44,9 @@ public class Animal extends BaseTimeEntity {  // auditing 상속
     @Column(length = 30)
     private String chargePhone;  // 담당자 연락처
 
+    @Enumerated(EnumType.STRING)
     @Column(length = 10, nullable = false)
-    private String species;  // 종류: DOG, CAT
+    private Species species;  // 종류: DOG, CAT
 
     @Column(length = 50)
     private String breed;  // 품종
@@ -56,8 +59,9 @@ public class Animal extends BaseTimeEntity {  // auditing 상속
     @Column(length = 10)
     private String gender;  // 성별: M, F
 
+    @Enumerated(EnumType.STRING)
     @Column(length = 10)
-    private String size;  // 크기: S, M, L
+    private Size size;  // 크기: S, M, L
 
     @Column(precision = 5, scale = 2)
     private BigDecimal weight;  // 무게 (kg)

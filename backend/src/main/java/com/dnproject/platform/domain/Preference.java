@@ -1,5 +1,7 @@
 package com.dnproject.platform.domain;
 
+import com.dnproject.platform.domain.constant.Size;
+import com.dnproject.platform.domain.constant.Species;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -20,16 +22,24 @@ public class Preference extends BaseTimeEntity{
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
-    private String species;    // 선호 종 (개, 고양이 등)
-    private Integer minAge;    // 희망 최소 나이
-    private Integer maxAge;    // 희망 최대 나이
-    private String size;       // 선호 크기 (소형, 중형, 대형)
-    private String region;     // 선호 지역
-    private String temperament; // 선호 성격
+    @Enumerated(EnumType.STRING)
+    @Column(length = 10)
+    private Species species;
+
+    private Integer minAge;
+    private Integer maxAge;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 10)
+    private Size size;
+
+    private String region;
+    private String temperament;
+
 
     @Builder
-    public Preference(User user, String species, Integer minAge, Integer maxAge,
-                      String size, String region, String temperament) {
+    public Preference(User user, Species species, Integer minAge, Integer maxAge,
+                      Size size, String region, String temperament) {
         this.user = user;
         this.species = species;
         this.minAge = minAge;
@@ -40,8 +50,8 @@ public class Preference extends BaseTimeEntity{
     }
 
     // 선호도 정보 수정
-    public void update(String species, Integer minAge, Integer maxAge,
-                        String size, String region, String temperament) {
+    public void update(Species species, Integer minAge, Integer maxAge,
+                       Size size, String region, String temperament) {
         this.species = species;
         this.minAge = minAge;
         this.maxAge = maxAge;
