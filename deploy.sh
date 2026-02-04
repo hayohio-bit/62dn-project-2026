@@ -1,73 +1,85 @@
 #!/bin/bash
 
-# deploy.sh - Helper script to push changes to a branch
-# Usage: ./deploy.sh
-
 echo "=========================================="
-echo "    62댕냥이 Deployment/Push Script      "
+echo "   62댕냥이 Team Safe Deploy Script 🚀   "
 echo "=========================================="
 
-# Check if git is initialized
+# 1. Git repo 체크
 if [ ! -d ".git" ]; then
-    echo "Error: Not a git repository."
+    echo "❌ Error: Not a git repository."
     exit 1
 fi
 
-# Get current branch
+# 2. 현재 브랜치
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-echo "Current branch: $CURRENT_BRANCH"
+echo "📌 Current branch: $CURRENT_BRANCH"
 
-# Prompt for target branch (default to current)
-read -p "Enter target branch to push to (default: $CURRENT_BRANCH): " TARGET_BRANCH
-TARGET_BRANCH=${TARGET_BRANCH:-$CURRENT_BRANCH}
-
-# Prompt for commit message
-read -p "Enter commit message: " COMMIT_MSG
-if [ -z "$COMMIT_MSG" ]; then
-    echo "Error: Commit message cannot be empty."
-    exit 1
-fi
+# 3. 위험 브랜치 차단
+PROTECTED_BRANCHES=("main" "develop")
+for branch in "${PROTECTED_BRANCHES[@]}"; do
+    if [ "$CURRENT_BRANCH" = "$branch" ]; then
+        echo "❌ Direct push to '$branch' is not allowed."
+        echo "👉 Please use a feature branch and open a PR."
+        exit 1
+    fi
+done
 
 echo "------------------------------------------"
-echo "Adding all changes..."
-git add .
 
-echo "Committing with message: '$COMMIT_MSG'..."
-git commit -m "$COMMIT_MSG"
+# 4. 변경사항 확인
+if git diff --quiet && git diff --cached --quiet; then
+    echo "⚠️ No changes to commit."
+    exit 0
+fi
 
-echo "Pushing to origin/$TARGET_BRANCH..."
-git push origin "$TARGET_BRANCH"
+# 5. git add 선택
+read -p "Add all changes? (git add .) (y/n): " ADD_ALL
+if [[ "$ADD_ALL" =~ ^[Yy]$ ]]; then
+    git add .
+else
+    echo "👉 Please stage files manually, then re-run script."
+    exit 0
+fi
 
-if [ $? -eq 0 ]; then
-    echo "=========================================="
-    echo "       Push Successful!                   "
-    echo "=========================================="
-    
-    # Check if gh CLI is installed
-    if ! command -v gh &> /dev/null; then
-        echo "Warning: GitHub CLI ('gh') is not installed."
-        echo "Skipping automatic Pull Request creation."
-        echo "To enable this, install it: brew install gh"
-        exit 0
-    fi
+# 6. 커밋 메시지
+read -p "Enter commit message: " COMMIT_MSG
+if [ -z "$COMMIT_MSG" ]; then
+    echo "❌ Commit message cannot be empty."
+    exit 1
+fi
 
-    echo "------------------------------------------"
-    read -p "Do you want to create a Pull Request now? (y/n) " CREATE_PR
+git commit -m "$COMMIT_MSG" || {
+    echo "❌ Commit failed."
+    exit 1
+}
+
+# 7. push (현재 브랜치만 허용)
+echo "------------------------------------------"
+echo "🚀 Pushing to origin/$CURRENT_BRANCH..."
+git push origin "$CURRENT_BRANCH" || {
+    echo "❌ Push failed."
+    exit 1
+}
+
+echo "=========================================="
+echo "   ✅ Push Successful!                    "
+echo "=========================================="
+
+# 8. PR 생성 (선택)
+if command -v gh &> /dev/null; then
+    read -p "Create Pull Request to main now? (y/n): " CREATE_PR
     if [[ "$CREATE_PR" =~ ^[Yy]$ ]]; then
-        # Check if already logged in
         if ! gh auth status &> /dev/null; then
-            echo "You need to login to GitHub CLI first."
             gh auth login
         fi
 
-        echo "Creating Pull Request..."
-        # Create PR: base=main (or prompt?), title=commit msg, body=interactive or same
-        gh pr create --base main --head "$TARGET_BRANCH" --title "$COMMIT_MSG" --body "$COMMIT_MSG" --web
+        gh pr create \
+          --base main \
+          --head "$CURRENT_BRANCH" \
+          --title "$COMMIT_MSG" \
+          --body "$COMMIT_MSG" \
+          --web
     fi
-
 else
-    echo "=========================================="
-    echo "       Push Failed!                       "
-    echo "=========================================="
-    exit 1
+    echo "ℹ️ GitHub CLI not installed. Skipping PR creation."
 fi
