@@ -29,11 +29,11 @@ public class DonationResponse {
                 .id(donation.getId())
                 .donorName(donation.getDonorName())
                 .shelterName(donation.getShelter().getName())
-                .donationType(donation.getDonationType().name())
+                .donationType(donation.getDonationType().getDescription())
                 .amount(donation.getAmount())
                 .itemName(donation.getItemName())
                 .quantity(donation.getQuantity())
-                .status(donation.getStatus().name())
+                .status(donation.getStatus().getDescription())
                 .createdAt(donation.getCreatedAt())
                 .build();
     }

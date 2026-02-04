@@ -3,6 +3,7 @@ package com.dnproject.platform.domain;
 import com.dnproject.platform.domain.constant.DonationStatus;
 import com.dnproject.platform.domain.constant.DonationType;
 import com.dnproject.platform.domain.constant.DonorType;
+import com.dnproject.platform.domain.constant.PaymentMethod;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -67,8 +68,9 @@ public class Donation extends BaseTimeEntity{
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal amount;  //후원 금액
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "payment_method", nullable = false, length = 20)
-    private String paymentMethod;   //결제 방법
+    private PaymentMethod paymentMethod;   //결제 방법
 
     @Column(name = "receipt_requested")
     @Builder.Default

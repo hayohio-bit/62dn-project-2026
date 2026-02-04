@@ -34,7 +34,7 @@ public class DonationRequestResponse {
                 .targetQuantity(request.getTargetQuantity())
                 .currentQuantity(request.getCurrentQuantity())
                 .deadline(request.getDeadline())
-                .status(request.getStatus().name())
+                .status(request.getStatus().getDescription())
                 .build();
     }
 }
