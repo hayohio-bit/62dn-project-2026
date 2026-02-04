@@ -107,6 +107,48 @@ cd 62dn-project-2026
 - **반응형 디자인**: 모바일과 데스크탑 모두 최적화된 UX/UI
 
 ## 🤝 협업 가이드
-- **Branch Strategy**: Git Flow 또는 GitHub Flow 전략을 따릅니다.
-- **Commit Message**: `feat:`, `fix:`, `docs:`, `style:`, `refactor:`, `test:`, `chore:` 접두사를 사용합니다.
-- **Pull Request**: 모든 코드 변경은 PR을 통해 리뷰를 거친 후 병합됩니다.
+
+### Git 워크플로우
+**📖 완전한 가이드**: [docs/GIT_WORKFLOW.md](docs/GIT_WORKFLOW.md)
+
+#### 브랜치 전략
+- **GitHub Flow** 사용 (간소화된 워크플로우)
+- `main`: 프로덕션 배포 브랜치 (보호됨)
+- `feature/<name>`: 기능 개발
+- `fix/<name>`: 버그 수정
+- `hotfix/<name>`: 긴급 수정
+
+#### 작업 흐름
+```bash
+# 1. 최신 main으로 동기화
+git checkout main && git pull origin main
+
+# 2. 작업 브랜치 생성
+git checkout -b feature/<기능명>
+
+# 3. 작업 후 커밋 (Conventional Commits)
+git commit -m "feat(scope): 설명"
+
+# 4. 푸시 및 PR 생성
+git push origin feature/<기능명>
+```
+
+#### 커밋 메시지 (Conventional Commits)
+- `feat(auth): add JWT login` - 새 기능
+- `fix(animal): resolve null pointer` - 버그 수정
+- `docs(readme): update setup guide` - 문서
+- `refactor(api): extract helper function` - 리팩토링
+- `chore(deps): update spring boot` - 빌드/설정
+
+#### Pull Request 규칙
+- ✅ 모든 코드 변경은 **PR 필수** (main 직접 푸시 금지)
+- ✅ **최소 1명 승인** 후 머지
+- ✅ **CI 통과** 확인 (자동 린트, 테스트, 빌드)
+- ✅ PR 템플릿 작성 (변경사항, 테스트 방법, 체크리스트)
+
+#### 코드 리뷰
+- CODEOWNERS 파일에 따라 자동으로 리뷰어 지정
+- 보안, 성능, 테스트 커버리지 확인
+- 건설적인 피드백 제공
+
+**자세한 내용**: [Git 워크플로우 완전 가이드](docs/GIT_WORKFLOW.md) | [충돌 해결 가이드](docs/GIT_CONFLICT_POSTMORTEM.md)
