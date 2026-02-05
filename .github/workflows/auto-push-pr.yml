@@ -1,6 +1,6 @@
 name: 🚀 Auto Push & PR
 on:
-  workflow_dispatch:  # 버튼 클릭으로 실행
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -16,9 +16,8 @@ jobs:
         fetch-depth: 0
         token: ${{ secrets.GITHUB_TOKEN }}
     
-    - name: 🔧 Setup GitHub CLI
-      uses: github/gh-cli-setup@v1
-      
+    # Setup 스텝 삭제! (ubuntu-latest에 gh 사전 설치됨)
+    
     - name: ⚙️ Auto-config Git CLI
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
