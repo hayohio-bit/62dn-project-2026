@@ -48,7 +48,8 @@ public class User extends BaseTimeEntity{
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private Role role;
+    @Builder.Default
+    private Role role = Role.USER;
 
     @OneToMany(mappedBy = "user")
     private List<Volunteer> volunteers = new ArrayList<>();
