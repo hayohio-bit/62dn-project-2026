@@ -55,6 +55,9 @@ public class DonationApplyRequest {
     @NotNull(message = "영수증 신청 여부를 선택해주세요.")
     private Boolean receiptRequested;
 
+    @NotBlank(message = "후원 카테고리는 필수입니다.")
+    private String donationCategory;
+
     // DTO -> Entity 변환
     public Donation toEntity(User user, Shelter shelter, DonationRequest donationRequest) {
         return Donation.builder()
@@ -65,6 +68,7 @@ public class DonationApplyRequest {
                 .donorPhone(donorPhone)
                 .donorEmail(donorEmail)
                 .donationType(donationType)
+                .donationCategory(donationCategory)
                 .amount(amount)
                 .itemName(itemName)
                 .quantity(quantity)
