@@ -31,12 +31,7 @@ jobs:
           git config --global user.name "GitHub Actions"
           git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
 
-      - name: 📝 Auto commit & push
-        run: |
-          chmod +x .github/scripts/auto-deploy.sh
-          .github/scripts/auto-deploy.sh
-
-      - name: 🔗 Auto create PR
+      - name: 🚀 Create PR
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -45,5 +40,6 @@ jobs:
             --base main \
             --head "$CURRENT_BRANCH" \
             --title "🚀 Auto Deploy PR from $CURRENT_BRANCH" \
-            --body "자동 배포 스크립트 실행 결과입니다.\n\n$(date)" \
-            --web
+            --body "자동 배포 스크립트 실행 결과입니다.\n\n$(date)" || echo "PR 이미 존재 또는 생성 완료"
+          PR_URL=$(gh pr view --json url --jq .url)
+          echo "✅ PR 링크: $PR_URL"
