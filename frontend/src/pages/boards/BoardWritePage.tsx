@@ -49,8 +49,9 @@ export default function BoardWritePage() {
       const result = await boardApi.create(formData);
       alert('게시글이 작성되었습니다!');
       navigate(`/boards/${result.id}`);
-    } catch (err: any) {
-      alert(err.response?.data?.message || '게시글 작성에 실패했습니다.');
+    } catch (err: unknown) {
+      const errorMsg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      alert(errorMsg || '게시글 작성에 실패했습니다.');
     } finally {
       setSubmitting(false);
     }

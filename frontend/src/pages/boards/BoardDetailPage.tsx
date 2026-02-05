@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { boardApi } from '@/api';
 import type { Board, Comment } from '@/types/entities';
@@ -23,14 +23,7 @@ export default function BoardDetailPage() {
   const [commentText, setCommentText] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => {
-    if (id) {
-      loadBoard();
-      loadComments();
-    }
-  }, [id]);
-
-  const loadBoard = async () => {
+  const loadBoard = useCallback(async () => {
     try {
       setLoading(true);
       
@@ -56,9 +49,9 @@ export default function BoardDetailPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id, navigate]);
 
-  const loadComments = async () => {
+  const loadComments = useCallback(async () => {
     try {
       // 목업 데이터 사용 (백엔드 연결 전)
       const USE_MOCK = true;
@@ -73,7 +66,14 @@ export default function BoardDetailPage() {
     } catch (err) {
       console.error(err);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    if (id) {
+      loadBoard();
+      loadComments();
+    }
+  }, [id, loadBoard, loadComments]);
 
   const handleCommentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -84,8 +84,9 @@ export default function BoardDetailPage() {
       await boardApi.addComment(Number(id), { content: commentText });
       setCommentText('');
       loadComments();
-    } catch (err: any) {
-      alert(err.response?.data?.message || '댓글 작성에 실패했습니다.');
+    } catch (err: unknown) {
+      const errorMsg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      alert(errorMsg || '댓글 작성에 실패했습니다.');
     } finally {
       setSubmitting(false);
     }

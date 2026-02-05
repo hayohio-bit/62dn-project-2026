@@ -13,19 +13,32 @@ declare global {
   interface Window {
     kakao?: {
       maps: {
-        Map: new (container: HTMLElement, options: { center: any; level: number }) => any;
-        LatLng: new (lat: number, lng: number) => any;
-        Marker: new (options: { position: any }) => any;
-        event: { addListener: (target: any, type: string, handler: () => void) => void };
+        Map: new (container: HTMLElement, options: { center: KakaoLatLng; level: number }) => KakaoMapInstance;
+        LatLng: new (lat: number, lng: number) => KakaoLatLng;
+        Marker: new (options: { position: KakaoLatLng }) => KakaoMarker;
+        event: { addListener: (target: KakaoMapInstance | KakaoMarker, type: string, handler: () => void) => void };
         services: {
           Geocoder: new () => {
             addressSearch: (address: string, callback: (result: { x: string; y: string }[], status: string) => void) => void;
           };
           Status: { OK: string };
         };
+        load: (callback: () => void) => void;
       };
     };
   }
+}
+
+interface KakaoLatLng {
+  getLat(): number;
+  getLng(): number;
+}
+interface KakaoMapInstance {
+  setCenter(latlng: KakaoLatLng): void;
+  setLevel(level: number): void;
+}
+interface KakaoMarker {
+  setMap(map: KakaoMapInstance | null): void;
 }
 
 export interface KakaoMapProps {
@@ -45,7 +58,7 @@ function loadKakaoScript(): Promise<void> {
   return new Promise((resolve, reject) => {
     const existing = document.querySelector('script[src*="dapi.kakao.com"][src*="maps/sdk"]');
     if (existing) {
-      const kakao = (window as any).kakao;
+      const kakao = window.kakao;
       if (kakao?.maps?.load) {
         kakao.maps.load(() => resolve());
       } else if (kakao?.maps?.services) {
@@ -59,7 +72,7 @@ function loadKakaoScript(): Promise<void> {
     script.src = `https:${KAKAO_SCRIPT_URL}?appkey=${APP_KEY}&libraries=services&autoload=false`;
     script.async = true;
     script.onload = () => {
-      const kakao = (window as any).kakao;
+      const kakao = window.kakao;
       if (!kakao?.maps) {
         reject(new Error('Kakao Maps SDK not available'));
         return;
@@ -83,7 +96,7 @@ export default function KakaoMap({
   className = '',
 }: KakaoMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<any>(null);
+  const mapRef = useRef<KakaoMapInstance | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -101,7 +114,7 @@ export default function KakaoMap({
     loadKakaoScript()
       .then(() => {
         if (cancelled || !containerRef.current) return;
-        const kakao = (window as any).kakao;
+        const kakao = window.kakao;
         if (!kakao?.maps?.services?.Geocoder) {
           setError('지도 서비스(Geocoder)를 불러올 수 없습니다. 잠시 후 다시 시도해 주세요.');
           return;
@@ -124,7 +137,7 @@ export default function KakaoMap({
           showMap(latitude!, longitude!);
           return;
         }
-        geocoder.addressSearch(address!.trim(), (result: unknown, status: unknown) => {
+        geocoder.addressSearch(address!.trim(), (result: { x: string; y: string }[], status: string) => {
           if (cancelled) return;
           const arr = Array.isArray(result) ? result : [];
           if (status === kakao.maps.services.Status.OK && arr[0]) {
