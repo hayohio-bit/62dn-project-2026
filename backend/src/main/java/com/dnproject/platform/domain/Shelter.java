@@ -71,11 +71,19 @@ public class Shelter extends BaseTimeEntity{
     private LocalDateTime verifiedAt;
 
     @OneToMany(mappedBy = "shelter")
+    @Builder.Default
     private List<Volunteer> volunteers = new ArrayList<>();
 
     @OneToMany(mappedBy = "shelter")
     private List<VolunteerRecruitment> volunteerRecruitments = new ArrayList<>();
 
+    public void updateVerificationStatus(VerificationStatus status) {
+        this.verificationStatus = status;
+
+        if (status == VerificationStatus.VERIFIED) {
+            this.verifiedAt = LocalDateTime.now();
+        }
+    }
 
 
 }
