@@ -7,4 +7,4 @@ spring:
       ddl-auto: update
     show-sql: true
   datasource:
-    url: jdbc:mysql://localhost:3306/dn_platform_dev
+    url: jdbc:mysql://localhost:3306/dn_platform
