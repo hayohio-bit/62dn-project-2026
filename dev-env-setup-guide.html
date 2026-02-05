@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>프로젝트 개발 환경 자동 설정</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 900px;
+            width: 100%;
+            padding: 40px;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        .step {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+        .step h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+        }
+        .step-number {
+            background: #667eea;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        input[type="text"], input[type="password"], textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        input[type="text"]:focus, input[type="password"]:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            margin-top: 10px;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        button {
+            flex: 1;
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #5568d3;
+        }
+        .copy-btn {
+            background: #48bb78;
+        }
+        .copy-btn:hover {
+            background: #38a169;
+        }
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            color: #856404;
+        }
+        .success {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            color: #155724;
+        }
+        .info {
+            background: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            color: #0c5460;
+            font-size: 14px;
+        }
+        .hidden {
+            display: none;
+        }
+        .os-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .os-tab {
+            flex: 1;
+            padding: 10px;
+            background: #e0e0e0;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+        .os-tab.active {
+            background: #667eea;
+            color: white;
+        }
+        .os-content {
+            display: none;
+        }
+        .os-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 프로젝트 개발 환경 자동 설정</h1>
+        <p class="subtitle">신규 팀원을 위한 원클릭 설정 가이드</p>
+
+        <div class="info">
+            <strong>📋 이 도구로 할 수 있는 것:</strong><br>
+            - Git CLI 자동 설치 및 계정 연결<br>
+            - 저장소 클론 및 의존성 자동 설치<br>
+            - Frontend/Backend 환경 자동 구성<br>
+            - deploy.sh 실행 준비 완료
+        </div>
+
+        <!-- Step 1: Git CLI 설치 -->
+        <div class="step">
+            <h2><span class="step-number">1</span>Git CLI 설치</h2>
+            
+            <div class="os-tabs">
+                <button class="os-tab active" onclick="switchOS('windows')">Windows</button>
+                <button class="os-tab" onclick="switchOS('mac')">macOS</button>
+                <button class="os-tab" onclick="switchOS('linux')">Linux</button>
+            </div>
+
+            <div class="os-content active" id="windows">
+                <p><strong>PowerShell을 관리자 권한으로 실행 후 아래 명령 실행:</strong></p>
+                <div class="code-block" id="git-install-windows">winget install --id Git.Git -e --source winget</div>
+                <div class="button-group">
+                    <button class="copy-btn" onclick="copyCode('git-install-windows')">📋 복사</button>
+                </div>
+                <p style="margin-top: 10px; font-size: 13px; color: #666;">
+                    ※ winget이 없다면: <a href="https://git-scm.com/download/win" target="_blank">https://git-scm.com/download/win</a> 에서 설치 후 재부팅
+                </p>
+            </div>
+
+            <div class="os-content" id="mac">
+                <p><strong>터미널에서 실행:</strong></p>
+                <div class="code-block" id="git-install-mac">brew install git</div>
+                <div class="button-group">
+                    <button class="copy-btn" onclick="copyCode('git-install-mac')">📋 복사</button>
+                </div>
+                <p style="margin-top: 10px; font-size: 13px; color: #666;">
+                    ※ Homebrew가 없다면: <code>/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"</code>
+                </p>
+            </div>
+
+            <div class="os-content" id="linux">
+                <p><strong>터미널에서 실행 (Ubuntu/Debian):</strong></p>
+                <div class="code-block" id="git-install-linux">sudo apt update && sudo apt install git -y</div>
+                <div class="button-group">
+                    <button class="copy-btn" onclick="copyCode('git-install-linux')">📋 복사</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Git 계정 설정 -->
+        <div class="step">
+            <h2><span class="step-number">2</span>Git 계정 연결</h2>
+            
+            <div class="input-group">
+                <label>GitHub 사용자 이름:</label>
+                <input type="text" id="git-username" placeholder="예: honggildon">
+            </div>
+
+            <div class="input-group">
+                <label>GitHub 이메일:</label>
+                <input type="text" id="git-email" placeholder="예: hong@example.com">
+            </div>
+
+            <button onclick="generateGitConfig()">🔧 Git 설정 명령어 생성</button>
+
+            <div id="git-config-output" class="hidden">
+                <div class="code-block" id="git-config-commands"></div>
+                <div class="button-group">
+                    <button class="copy-btn" onclick="copyCode('git-config-commands')">📋 복사하여 터미널 실행</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: SSH Key 생성 (선택사항) -->
+        <div class="step">
+            <h2><span class="step-number">3</span>SSH Key 생성 (권장)</h2>
+            <p style="margin-bottom: 15px; color: #666; font-size: 14px;">Private 저장소 접근 시 필요합니다.</p>
+
+            <button onclick="generateSSHCommands()">🔑 SSH Key 생성 명령어 보기</button>
+
+            <div id="ssh-output" class="hidden">
+                <div class="code-block" id="ssh-commands"></div>
+                <div class="button-group">
+                    <button class="copy-btn" onclick="copyCode('ssh-commands')">📋 복사하여 터미널 실행</button>
+                </div>
+                <div class="warning" style="margin-top: 15px;">
+                    <strong>⚠️ 중요:</strong> SSH Key 생성 후 출력되는 공개키를 복사하여 
+                    <a href="https://github.com/settings/keys" target="_blank">GitHub Settings → SSH Keys</a>에 등록하세요.
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 4: 프로젝트 클론 및 설정 -->
+        <div class="step">
+            <h2><span class="step-number">4</span>프로젝트 클론 및 의존성 설치</h2>
+
+            <div class="input-group">
+                <label>GitHub 저장소 URL:</label>
+                <input type="text" id="repo-url" placeholder="예: https://github.com/username/repo-name.git">
+            </div>
+
+            <div class="input-group">
+                <label>프로젝트 루트 디렉토리 (선택사항):</label>
+                <input type="text" id="project-dir" placeholder="기본값: 현재 디렉토리">
+            </div>
+
+            <div class="input-group">
+                <label>Frontend 폴더 이름:</label>
+                <input type="text" id="frontend-folder" placeholder="예: frontend" value="frontend">
+            </div>
+
+            <div class="input-group">
+                <label>Backend 폴더 이름:</label>
+                <input type="text" id="backend-folder" placeholder="예: backend" value="backend">
+            </div>
+
+            <div class="input-group">
+                <label>Backend 빌드 시스템:</label>
+                <select id="backend-type" style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                    <option value="gradle">Gradle (Spring Boot)</option>
+                    <option value="maven">Maven</option>
+                    <option value="none">없음 (Frontend만)</option>
+                </select>
+            </div>
+
+            <button onclick="generateSetupScript()">⚙️ 설치 스크립트 생성</button>
+
+            <div id="setup-output" class="hidden">
+                <p style="margin: 15px 0; font-weight: 600;">🖥️ 실행할 명령어:</p>
+                <div class="code-block" id="setup-commands"></div>
+                <div class="button-group">
+                    <button class="copy-btn" onclick="copyCode('setup-commands')">📋 전체 복사하여 실행</button>
+                    <button onclick="downloadScript()">💾 스크립트 파일 다운로드</button>
+                </div>
+                <div class="success">
+                    ✅ 위 명령어를 터미널에서 실행하면 모든 설정이 자동으로 완료됩니다!
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 5: Deploy 스크립트 실행 -->
+        <div class="step">
+            <h2><span class="step-number">5</span>Deploy 스크립트 실행</h2>
+            <p style="margin-bottom: 15px; color: #666; font-size: 14px;">
+                모든 설정이 완료되면 deploy.sh를 실행하여 PR을 생성할 수 있습니다.
+            </p>
+
+            <div class="input-group">
+                <label>브랜치 이름 (선택사항):</label>
+                <input type="text" id="branch-name" placeholder="예: feature/new-feature">
+            </div>
+
+            <button onclick="generateDeployCommands()">🚀 Deploy 명령어 생성</button>
+
+            <div id="deploy-output" class="hidden">
+                <div class="code-block" id="deploy-commands"></div>
+                <div class="button-group">
+                    <button class="copy-btn" onclick="copyCode('deploy-commands')">📋 복사하여 실행</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 6: 검증 -->
+        <div class="step">
+            <h2><span class="step-number">6</span>설치 확인</h2>
+            <p style="margin-bottom: 15px; color: #666; font-size: 14px;">
+                모든 설정이 올바르게 되었는지 확인합니다.
+            </p>
+
+            <div class="code-block" id="verify-commands">git --version
+node --version
+npm --version</div>
+            <div class="button-group">
+                <button class="copy-btn" onclick="copyCode('verify-commands')">📋 복사하여 확인</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function switchOS(os) {
+            // Tab 활성화
+            document.querySelectorAll('.os-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Content 표시
+            document.querySelectorAll('.os-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(os).classList.add('active');
+        }
+
+        function copyCode(elementId) {
+            const element = document.getElementById(elementId);
+            const text = element.innerText;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = event.target;
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '✅ 복사됨!';
+                btn.style.background = '#28a745';
+                
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.style.background = '#48bb78';
+                }, 2000);
+            });
+        }
+
+        function generateGitConfig() {
+            const username = document.getElementById('git-username').value;
+            const email = document.getElementById('git-email').value;
+
+            if (!username || !email) {
+                alert('사용자 이름과 이메일을 모두 입력해주세요.');
+                return;
+            }
+
+            const commands = `git config --global user.name "${username}"
+git config --global user.email "${email}"
+git config --global init.defaultBranch main
+git config --list`;
+
+            document.getElementById('git-config-commands').innerText = commands;
+            document.getElementById('git-config-output').classList.remove('hidden');
+        }
+
+        function generateSSHCommands() {
+            const email = document.getElementById('git-email').value || 'your_email@example.com';
+
+            const commands = `ssh-keygen -t ed25519 -C "${email}"
+# Enter를 3번 눌러 기본 설정 사용
+
+# SSH Agent 시작
+eval "$(ssh-agent -s)"
+
+# SSH Key 추가
+ssh-add ~/.ssh/id_ed25519
+
+# 공개키 출력 (아래 출력을 복사하여 GitHub에 등록)
+cat ~/.ssh/id_ed25519.pub`;
+
+            document.getElementById('ssh-commands').innerText = commands;
+            document.getElementById('ssh-output').classList.remove('hidden');
+        }
+
+        function generateSetupScript() {
+            const repoUrl = document.getElementById('repo-url').value;
+            const projectDir = document.getElementById('project-dir').value || '.';
+            const frontendFolder = document.getElementById('frontend-folder').value || 'frontend';
+            const backendFolder = document.getElementById('backend-folder').value || 'backend';
+            const backendType = document.getElementById('backend-type').value;
+
+            if (!repoUrl) {
+                alert('저장소 URL을 입력해주세요.');
+                return;
+            }
+
+            const repoName = repoUrl.split('/').pop().replace('.git', '');
+
+            let commands = `# 저장소 클론
+git clone ${repoUrl}
+cd ${repoName}
+
+# Frontend 설정
+cd ${frontendFolder}
+npm install
+echo "✅ Frontend 의존성 설치 완료"
+
+# Frontend 실행 확인 (선택사항)
+# npm run dev
+
+cd ..
+
+# Backend 설정`;
+
+            if (backendType === 'gradle') {
+                commands += `
+cd ${backendFolder}
+
+# Gradle Wrapper 실행 권한 부여
+chmod +x gradlew
+
+# Gradle 의존성 다운로드
+./gradlew build -x test
+
+echo "✅ Backend 의존성 설치 완료"
+
+# Backend 실행 확인 (선택사항)
+# ./gradlew bootRun
+
+cd ..`;
+            } else if (backendType === 'maven') {
+                commands += `
+cd ${backendFolder}
+
+# Maven Wrapper 실행 권한 부여
+chmod +x mvnw
+
+# Maven 의존성 다운로드
+./mvnw clean install -DskipTests
+
+echo "✅ Backend 의존성 설치 완료"
+
+# Backend 실행 확인 (선택사항)
+# ./mvnw spring-boot:run
+
+cd ..`;
+            } else {
+                commands += `
+# Backend 설정 없음
+cd ..`;
+            }
+
+            commands += `
+
+# deploy.sh 실행 권한 부여
+if [ -f "deploy.sh" ]; then
+    chmod +x deploy.sh
+    echo "✅ deploy.sh 실행 권한 부여 완료"
+fi
+
+echo "🎉 모든 설정이 완료되었습니다!"
+echo "이제 'npm run dev'로 Frontend를, './gradlew bootRun'으로 Backend를 실행할 수 있습니다."`;
+
+            document.getElementById('setup-commands').innerText = commands;
+            document.getElementById('setup-output').classList.remove('hidden');
+        }
+
+        function generateDeployCommands() {
+            const branchName = document.getElementById('branch-name').value || 'feature/new-feature';
+
+            const commands = `# 새 브랜치 생성 및 체크아웃
+git checkout -b ${branchName}
+
+# 변경사항 커밋
+git add .
+git commit -m "feat: 새로운 기능 추가"
+
+# deploy.sh 실행
+./deploy.sh
+
+# 또는 수동 push 및 PR 생성
+git push origin ${branchName}
+
+echo "✅ PR 생성 준비 완료! GitHub에서 Pull Request를 생성하세요."`;
+
+            document.getElementById('deploy-commands').innerText = commands;
+            document.getElementById('deploy-output').classList.remove('hidden');
+        }
+
+        function downloadScript() {
+            const commands = document.getElementById('setup-commands').innerText;
+            const blob = new Blob([commands], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'setup-project.sh';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>
