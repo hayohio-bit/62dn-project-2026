@@ -86,5 +86,7 @@ public class Volunteer extends BaseTimeEntity{
     @Builder.Default
     private VolunteerStatus volunteerStatus = VolunteerStatus.PENDING;  // 신청 상태
 
-
+    public void updateStatus(VolunteerStatus status) {
+        this.volunteerStatus = status;
+    }
 }
