@@ -1,10 +1,7 @@
 package com.dnproject.platform.dto.response;
 
 import com.dnproject.platform.domain.Donation;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -12,6 +9,7 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 @AllArgsConstructor
+@ToString
 public class DonationResponse {
     private Long id;
     private String donorName;

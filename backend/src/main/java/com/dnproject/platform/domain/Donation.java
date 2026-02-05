@@ -99,4 +99,11 @@ public class Donation extends BaseTimeEntity{
     @Builder.Default
     private DonationStatus status = DonationStatus.PENDING;
 
+    public void updateStatus(DonationStatus status) {
+        if (status == null) {
+            throw new IllegalArgumentException("변경할 상태값이 유효하지 않습니다.");
+        }
+        this.status = status;
+    }
+
 }

@@ -49,4 +49,16 @@ public class DonationRequest extends BaseTimeEntity{
     @Builder.Default
     private RequestStatus status = RequestStatus.OPEN;
 
+    public void updateCurrentQuantity(Integer addedQuantity) {
+        if (addedQuantity == null || addedQuantity <= 0) {
+            return;
+        }
+
+        this.currentQuantity += addedQuantity;
+
+        if (this.currentQuantity >= this.targetQuantity) {
+            this.status = RequestStatus.CLOSED;
+        }
+    }
+
 }
