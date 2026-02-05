@@ -1,45 +1,49 @@
 name: 🚀 Auto Push & PR
+
 on:
   workflow_dispatch:
     inputs:
       description:
-        description: '⚠️ 작업 브랜치(예: shy, feature/...) 선택! main에서 실행 ❌'
+        description: "⚠️ 작업 브랜치(예: shy, feature/...) 선택! main에서 실행 ❌"
         required: false
-        default: '현재 HEAD 브랜치 자동 사용'
+        default: "현재 HEAD 브랜치 자동 사용"
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     permissions:
       contents: write
       pull-requests: write
-    
+
     steps:
-    - name: 📥 Checkout code
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-        token: ${{ secrets.GITHUB_TOKEN }}
-    
-    - name: ⚙️ Auto-config Git CLI
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        gh auth login --with-token < <(echo "$GH_TOKEN")
-        gh auth status
-    
-    - name: 📝 Auto commit & push
-      run: |
-        chmod +x .github/scripts/auto-deploy.sh
-        .github/scripts/auto-deploy.sh
-    
-    - name: 🔗 Auto create PR
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-        gh pr create \
-          --base main \
-          --head "$CURRENT_BRANCH" \
-          --title "🚀 Auto Deploy PR from $CURRENT_BRANCH" \
-          --body "자동 배포 스크립트 실행 결과입니다.\n\n$(date)" \
-          --web
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # ✅ gh auth login 제거, Git + remote만 세팅
+      - name: ⚙️ Setup Git & Auth
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config --global user.email "actions@github.com"
+          git config --global user.name "GitHub Actions"
+          git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
+
+      - name: 📝 Auto commit & push
+        run: |
+          chmod +x .github/scripts/auto-deploy.sh
+          .github/scripts/auto-deploy.sh
+
+      - name: 🔗 Auto create PR
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+          gh pr create \
+            --base main \
+            --head "$CURRENT_BRANCH" \
+            --title "🚀 Auto Deploy PR from $CURRENT_BRANCH" \
+            --body "자동 배포 스크립트 실행 결과입니다.\n\n$(date)" \
+            --web
