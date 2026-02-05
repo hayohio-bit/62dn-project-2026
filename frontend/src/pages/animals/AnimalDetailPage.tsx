@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { animalApi, favoriteApi } from '@/api';
 import { useAuthStore } from '@/store/authStore';
@@ -22,21 +22,7 @@ export default function AnimalDetailPage() {
   const [favoriteIds, setFavoriteIds] = useState<number[]>([]);
   const [imageModalOpen, setImageModalOpen] = useState(false);
 
-  useEffect(() => {
-    if (id) {
-      loadAnimal();
-    }
-  }, [id]);
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      favoriteApi.getMyFavoriteIds().then(setFavoriteIds).catch(() => setFavoriteIds([]));
-    } else {
-      setFavoriteIds([]);
-    }
-  }, [isAuthenticated]);
-
-  const loadAnimal = async () => {
+  const loadAnimal = useCallback(async () => {
     try {
       setLoading(true);
       const data = await animalApi.getById(Number(id));
@@ -48,7 +34,21 @@ export default function AnimalDetailPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id, navigate]);
+
+  useEffect(() => {
+    if (id) {
+      loadAnimal();
+    }
+  }, [id, loadAnimal]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      favoriteApi.getMyFavoriteIds().then(setFavoriteIds).catch(() => setFavoriteIds([]));
+    } else {
+      setFavoriteIds([]);
+    }
+  }, [isAuthenticated]);
 
   if (loading) {
     return (

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthStore } from '@/store/authStore';
@@ -8,8 +8,7 @@ import { adoptionApi } from '@/api/adoption';
 import { volunteerApi } from '@/api/volunteer';
 import { donationApi } from '@/api/donation';
 import { notificationApi } from '@/api/notification';
-import type { ShelterResponse } from '@/types/dto';
-import type { NotificationResponse } from '@/types/dto';
+import type { ShelterResponse, NotificationResponse, AnimalListResponse } from '@/types/dto';
 import type { Adoption, Volunteer, Donation } from '@/types/entities';
 import type { AnimalCreateRequest } from '@/types/dto';
 import type { VolunteerRecruitmentCreateRequest } from '@/types/dto';
@@ -106,38 +105,7 @@ export default function AdminDashboardPage() {
   const [allVolunteers, setAllVolunteers] = useState<Volunteer[]>([]);
   const [allDonations, setAllDonations] = useState<Donation[]>([]);
 
-  useEffect(() => {
-    if (!isAuthenticated || !user) {
-      navigate('/admin/login', { replace: true });
-      return;
-    }
-    if (!ADMIN_ROLES.includes(user.role)) {
-      navigate('/', { replace: true });
-      return;
-    }
-    if (user.role === 'SHELTER_ADMIN') {
-      loadMyShelter();
-    }
-    if (user.role === 'SUPER_ADMIN' && superTab === 'approvals') {
-      loadPendingShelters();
-    } else if (superTab === 'approvals') {
-      setLoading(false);
-    }
-  }, [isAuthenticated, user, navigate, superTab]);
-
-  useEffect(() => {
-    if (user?.role === 'SHELTER_ADMIN' && shelterTab === 'notifications') {
-      loadNotifications();
-    }
-  }, [user?.role, shelterTab]);
-
-  useEffect(() => {
-    if (user?.role === 'SHELTER_ADMIN' && shelterTab === 'applications') {
-      loadPendingApplications();
-    }
-  }, [user?.role, shelterTab]);
-
-  const loadPendingApplications = async () => {
+  const loadPendingApplications = useCallback(async () => {
     setApplicationsLoading(true);
     try {
       const [adoptionsRes, volunteersRes, donationsRes] = await Promise.all([
@@ -155,7 +123,203 @@ export default function AdminDashboardPage() {
     } finally {
       setApplicationsLoading(false);
     }
-  };
+  }, []);
+
+  const loadApplicationsLog = useCallback(async () => {
+    setApplicationsLogLoading(true);
+    try {
+      const [adoptionsRes, volunteersRes, donationsRes] = await Promise.all([
+        adminApi.getAllAdoptions(0, 100),
+        adminApi.getAllVolunteers(0, 100),
+        adminApi.getAllDonations(0, 100),
+      ]);
+      const adoptions = adoptionsRes?.data?.data?.content ?? [];
+      const volunteers = volunteersRes?.data?.data?.content ?? [];
+      const donations = donationsRes?.data?.data?.content ?? [];
+      setAllAdoptions(adoptions);
+      setAllVolunteers(volunteers);
+      setAllDonations(donations);
+    } catch {
+      setAllAdoptions([]);
+      setAllVolunteers([]);
+      setAllDonations([]);
+    } finally {
+      setApplicationsLogLoading(false);
+    }
+  }, []);
+
+  const loadMyShelter = useCallback(async () => {
+    setShelterLoading(true);
+    try {
+      const res = await adminApi.getMyShelter();
+      const data = res.data?.data ?? res.data;
+      setMyShelter(data ?? null);
+    } catch {
+      setMyShelter(null);
+    } finally {
+      setShelterLoading(false);
+    }
+  }, []);
+
+  const loadPendingShelters = useCallback(async () => {
+    if (user?.role !== 'SUPER_ADMIN') return;
+    setLoading(true);
+    setError('');
+    try {
+      const res = await adminApi.getShelters('PENDING');
+      const data = res.data?.data ?? res.data;
+      setPendingShelters(Array.isArray(data) ? data : []);
+    } catch (e) {
+      const msg = (e as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      setError(msg ?? '보호소 목록을 불러오지 못했습니다.');
+      setPendingShelters([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [user?.role]);
+
+  const loadNotifications = useCallback(async () => {
+    setNotifLoading(true);
+    try {
+      const data = await notificationApi.getMyList(0, 30);
+      setNotifications(data?.content ?? []);
+    } catch {
+      setNotifications([]);
+    } finally {
+      setNotifLoading(false);
+    }
+  }, []);
+
+  const loadSyncHistory = useCallback(async () => {
+    setSyncHistoryLoading(true);
+    try {
+      const res = await adminApi.getSyncHistory(syncHistoryPage, 20);
+      const payload = res.data?.data ?? res.data;
+      if (payload?.content) {
+        setSyncHistory(payload.content);
+        setSyncHistoryTotalPages(payload.totalPages ?? 0);
+        setSyncHistoryTotalElements(payload.totalElements ?? 0);
+      }
+    } catch {
+      setSyncHistory([]);
+    } finally {
+      setSyncHistoryLoading(false);
+    }
+  }, [syncHistoryPage]);
+
+  const loadUsers = useCallback(async () => {
+    setUsersError('');
+    setUsersLoading(true);
+    try {
+      const role = roleFilter === '' ? undefined : (roleFilter as RoleFilter);
+      const res = await adminApi.getUsers(usersPage, 20, role);
+      const data = res.data?.data ?? res.data;
+      setUsers(data?.content ?? []);
+      setUsersTotalPages(data?.totalPages ?? 0);
+      setUsersTotalElements(data?.totalElements ?? 0);
+    } catch (e: unknown) {
+      const err = e as { response?: { data?: { message?: string }; status?: number } };
+      const msg = err.response?.data?.message ?? err.response?.status === 403 ? '권한이 없습니다.' : '회원 목록을 불러오지 못했습니다.';
+      setUsersError(msg);
+      setUsers([]);
+    } finally {
+      setUsersLoading(false);
+    }
+  }, [roleFilter, usersPage]);
+
+  const loadBoards = useCallback(async () => {
+    setBoardsError('');
+    setBoardsLoading(true);
+    try {
+      const type = boardTypeFilter === '' ? undefined : boardTypeFilter;
+      const res = await adminApi.getBoards(boardsPage, 20, type);
+      const data = res.data?.data ?? res.data;
+      setBoards(data?.content ?? []);
+      setBoardsTotalPages(data?.totalPages ?? 0);
+    } catch (e: unknown) {
+      const err = e as { response?: { data?: { message?: string }; status?: number } };
+      const msg = err.response?.data?.message ?? err.response?.status === 403 ? '권한이 없습니다.' : '게시글 목록을 불러오지 못했습니다.';
+      setBoardsError(msg);
+      setBoards([]);
+    } finally {
+      setBoardsLoading(false);
+    }
+  }, [boardTypeFilter, boardsPage]);
+
+  useEffect(() => {
+    if (!isAuthenticated || !user) {
+      navigate('/admin/login', { replace: true });
+      return;
+    }
+    if (!ADMIN_ROLES.includes(user.role)) {
+      navigate('/', { replace: true });
+      return;
+    }
+    if (user.role === 'SHELTER_ADMIN') {
+      loadMyShelter();
+    }
+    if (user.role === 'SUPER_ADMIN' && superTab === 'approvals') {
+      loadPendingShelters();
+    } else if (superTab === 'approvals') {
+      setLoading(false);
+    }
+  }, [isAuthenticated, user, navigate, superTab, loadPendingShelters, loadMyShelter]);
+
+  useEffect(() => {
+    if (user?.role === 'SHELTER_ADMIN' && shelterTab === 'notifications') {
+      loadNotifications();
+    }
+  }, [user?.role, shelterTab, loadNotifications]);
+
+  useEffect(() => {
+    if (user?.role === 'SHELTER_ADMIN' && shelterTab === 'applications') {
+      loadPendingApplications();
+    }
+  }, [user?.role, shelterTab, loadPendingApplications]);
+
+  useEffect(() => {
+    if (user?.role === 'SUPER_ADMIN' && superTab === 'members') {
+      loadUsers();
+    }
+  }, [user?.role, superTab, usersPage, roleFilter, loadUsers]);
+
+  useEffect(() => {
+    if (user?.role === 'SUPER_ADMIN' && superTab === 'boards') {
+      loadBoards();
+    }
+  }, [user?.role, superTab, boardsPage, boardTypeFilter, loadBoards]);
+
+  useEffect(() => {
+    if (user?.role === 'SUPER_ADMIN' && superTab === 'sync') {
+      loadSyncHistory();
+    }
+  }, [user?.role, superTab, syncHistoryPage, loadSyncHistory]);
+
+  useEffect(() => {
+    if (user?.role === 'SUPER_ADMIN' && superTab === 'applicationsLog') {
+      loadApplicationsLog();
+    }
+  }, [user?.role, superTab, loadApplicationsLog]);
+
+  const loadPendingApplications = useCallback(async () => {
+    setApplicationsLoading(true);
+    try {
+      const [adoptionsRes, volunteersRes, donationsRes] = await Promise.all([
+        adoptionApi.getPendingByShelter(0, 50),
+        volunteerApi.getPendingByShelter(0, 50),
+        donationApi.getPendingByShelter(0, 50),
+      ]);
+      setPendingAdoptions(adoptionsRes?.content ?? []);
+      setPendingVolunteers(volunteersRes?.content ?? []);
+      setPendingDonations(donationsRes?.content ?? []);
+    } catch {
+      setPendingAdoptions([]);
+      setPendingVolunteers([]);
+      setPendingDonations([]);
+    } finally {
+      setApplicationsLoading(false);
+    }
+  }, []);
 
   const handleAdoptionApprove = async (id: number) => {
     setApplicationActionLoading(`adoption-${id}`);
@@ -242,27 +406,27 @@ export default function AdminDashboardPage() {
     if (user?.role === 'SUPER_ADMIN' && superTab === 'members') {
       loadUsers();
     }
-  }, [user?.role, superTab, usersPage, roleFilter]);
+  }, [user?.role, superTab, usersPage, roleFilter, loadUsers]);
 
   useEffect(() => {
     if (user?.role === 'SUPER_ADMIN' && superTab === 'boards') {
       loadBoards();
     }
-  }, [user?.role, superTab, boardsPage, boardTypeFilter]);
+  }, [user?.role, superTab, boardsPage, boardTypeFilter, loadBoards]);
 
   useEffect(() => {
     if (user?.role === 'SUPER_ADMIN' && superTab === 'sync') {
       loadSyncHistory();
     }
-  }, [user?.role, superTab, syncHistoryPage]);
+  }, [user?.role, superTab, syncHistoryPage, loadSyncHistory]);
 
   useEffect(() => {
     if (user?.role === 'SUPER_ADMIN' && superTab === 'applicationsLog') {
       loadApplicationsLog();
     }
-  }, [user?.role, superTab]);
+  }, [user?.role, superTab, loadApplicationsLog]);
 
-  const loadApplicationsLog = async () => {
+  const loadApplicationsLog = useCallback(async () => {
     setApplicationsLogLoading(true);
     try {
       const [adoptionsRes, volunteersRes, donationsRes] = await Promise.all([
@@ -283,7 +447,7 @@ export default function AdminDashboardPage() {
     } finally {
       setApplicationsLogLoading(false);
     }
-  };
+  }, []);
 
   type LogEntry = { type: 'adoption'; item: Adoption } | { type: 'volunteer'; item: Volunteer } | { type: 'donation'; item: Donation };
   const applicationsLogEntries = useMemo<LogEntry[]>(() => {
@@ -311,7 +475,7 @@ export default function AdminDashboardPage() {
     return '-';
   };
 
-  const loadMyShelter = async () => {
+  const loadMyShelter = useCallback(async () => {
     setShelterLoading(true);
     try {
       const res = await adminApi.getMyShelter();
@@ -322,9 +486,9 @@ export default function AdminDashboardPage() {
     } finally {
       setShelterLoading(false);
     }
-  };
+  }, []);
 
-  const loadPendingShelters = async () => {
+  const loadPendingShelters = useCallback(async () => {
     if (user?.role !== 'SUPER_ADMIN') return;
     setLoading(true);
     setError('');
@@ -339,9 +503,9 @@ export default function AdminDashboardPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user?.role]);
 
-  const loadNotifications = async () => {
+  const loadNotifications = useCallback(async () => {
     setNotifLoading(true);
     try {
       const data = await notificationApi.getMyList(0, 30);
@@ -351,9 +515,9 @@ export default function AdminDashboardPage() {
     } finally {
       setNotifLoading(false);
     }
-  };
+  }, []);
 
-  const loadSyncHistory = async () => {
+  const loadSyncHistory = useCallback(async () => {
     setSyncHistoryLoading(true);
     try {
       const res = await adminApi.getSyncHistory(syncHistoryPage, 20);
@@ -368,7 +532,7 @@ export default function AdminDashboardPage() {
     } finally {
       setSyncHistoryLoading(false);
     }
-  };
+  }, [syncHistoryPage]);
 
   const handleSyncFromPublicApi = async () => {
     setSyncLoading(true);
@@ -439,7 +603,7 @@ export default function AdminDashboardPage() {
     }
   };
 
-  const loadUsers = async () => {
+  const loadUsers = useCallback(async () => {
     setUsersError('');
     setUsersLoading(true);
     try {
@@ -457,9 +621,9 @@ export default function AdminDashboardPage() {
     } finally {
       setUsersLoading(false);
     }
-  };
+  }, [roleFilter, usersPage]);
 
-  const loadBoards = async () => {
+  const loadBoards = useCallback(async () => {
     setBoardsError('');
     setBoardsLoading(true);
     try {
@@ -476,7 +640,7 @@ export default function AdminDashboardPage() {
     } finally {
       setBoardsLoading(false);
     }
-  };
+  }, [boardTypeFilter, boardsPage]);
 
   const handleSetBoardPinned = async (boardId: number, pinned: boolean) => {
     setBoardActionLoading(boardId);

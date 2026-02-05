@@ -76,7 +76,7 @@ export default function PreferenceModal({
                       : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
                   }`}
                   onClick={() =>
-                    setFormData({ ...formData, species: value ? (value as any) : undefined })
+                    setFormData({ ...formData, species: value ? (value as PreferenceRequest['species']) : undefined })
                   }
                 >
                   {label}
@@ -177,7 +177,7 @@ export default function PreferenceModal({
                       : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
                   }`}
                   onClick={() =>
-                    setFormData({ ...formData, size: value ? (value as any) : undefined })
+                    setFormData({ ...formData, size: value ? (value as PreferenceRequest['size']) : undefined })
                   }
                 >
                   {label}

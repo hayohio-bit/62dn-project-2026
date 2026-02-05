@@ -36,8 +36,8 @@ export default function StickyStackingSection({
     zIndex,
     top: `${topOffsetPx}px`,
     // CSS에서 스택 높이/여백 계산에 사용
-    ['--landing-stack-top' as any]: `${topOffsetPx}px`,
-  } as const;
+    ['--landing-stack-top' as string]: `${topOffsetPx}px`,
+  } as React.CSSProperties;
 
   return (
     <motion.div

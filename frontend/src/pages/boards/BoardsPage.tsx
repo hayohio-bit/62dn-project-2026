@@ -39,7 +39,7 @@ export default function BoardsPage() {
   const [loading, setLoading] = useState(true);
 
   const USE_MOCK = true;
-  const rawList = USE_MOCK ? mockBoards : [];
+  const rawList = useMemo(() => (USE_MOCK ? mockBoards : []), [USE_MOCK]);
 
   const filteredList = useMemo(() => {
     let list = type ? rawList.filter((b) => b.type === type) : rawList;
@@ -53,7 +53,7 @@ export default function BoardsPage() {
       );
     }
     return list;
-  }, [rawList, type, search]);
+  }, [rawList, type, search, USE_MOCK]);
 
   const paginatedList = useMemo(() => {
     const start = page * pageSize;
