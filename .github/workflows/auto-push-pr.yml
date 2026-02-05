@@ -1,4 +1,3 @@
-cat > .github/workflows/auto-push-pr.yml << 'EOF'
 name: 🚀 Auto Push & PR
 on:
   workflow_dispatch:  # 버튼 클릭으로 실행
