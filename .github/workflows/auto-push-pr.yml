@@ -42,4 +42,3 @@ jobs:
           --title "🚀 Auto Deploy PR from $CURRENT_BRANCH" \
           --body "자동 배포 스크립트 실행 결과입니다.\n\n$(date)" \
           --web
-EOF
