@@ -1,7 +1,11 @@
 name: 🚀 Auto Push & PR
 on:
   workflow_dispatch:
-
+    inputs:
+      description:
+        description: '⚠️ 작업 브랜치(예: shy, feature/...) 선택! main에서 실행 ❌'
+        required: false
+        default: '현재 HEAD 브랜치 자동 사용'
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -15,8 +19,6 @@ jobs:
       with:
         fetch-depth: 0
         token: ${{ secrets.GITHUB_TOKEN }}
-    
-    # Setup 스텝 삭제! (ubuntu-latest에 gh 사전 설치됨)
     
     - name: ⚙️ Auto-config Git CLI
       env:
