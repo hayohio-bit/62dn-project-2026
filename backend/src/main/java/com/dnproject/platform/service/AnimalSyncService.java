@@ -54,16 +54,20 @@ public class AnimalSyncService {
         int successCount = 0;
         int totalCount = items.size();
 
+        // 기본 보호소 조회 (Fallback용)
+        Shelter defaultShelter = shelterRepository.findAll().stream().findFirst().orElse(null);
+
         for (AnimalItem item : items) {
             try {
                 Shelter shelter = shelterRepository.findByPublicApiShelterId(item.getCareNm())
                         .orElseGet(() -> shelterRepository.findAll().stream()
                                 .filter(s -> s.getName().equals(item.getCareNm()))
                                 .findFirst()
-                                .orElse(null));
+                                .orElse(defaultShelter));
 
                 if (shelter == null) {
-                    log.warn("Shelter not found: {}. Skipping animal: {}", item.getCareNm(), item.getDesertionNo());
+                    log.warn("Shelter not found and no default shelter available. Skipping animal: {}",
+                            item.getDesertionNo());
                     continue;
                 }
 

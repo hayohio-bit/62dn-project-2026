@@ -75,7 +75,7 @@ public class PublicApiService {
                 .queryParam("pageNo", pageNo)
                 .queryParam("numOfRows", effectiveNumOfRows)
                 .queryParam("_type", defaultType)
-                .build(true)
+                .build()
                 .toUri();
 
         log.debug("Calling Public API: {}", uri);
