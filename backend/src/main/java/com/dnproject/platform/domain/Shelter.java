@@ -19,7 +19,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
-public class Shelter extends BaseTimeEntity{
+public class Shelter extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,10 +32,10 @@ public class Shelter extends BaseTimeEntity{
     private String address;
 
     @Column(precision = 10, scale = 8)
-    private BigDecimal latitude;    // 위도
+    private BigDecimal latitude; // 위도
 
     @Column(precision = 11, scale = 8)
-    private BigDecimal longitude;   // 경도
+    private BigDecimal longitude; // 경도
 
     @Column(nullable = false, length = 20)
     private String phone;
@@ -60,12 +60,12 @@ public class Shelter extends BaseTimeEntity{
     private String businessRegistrationFile;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "verification_status", nullable = false, length = 20)    // ENUM
+    @Column(name = "verification_status", nullable = false, length = 20) // ENUM
     @Builder.Default
     private VerificationStatus verificationStatus = VerificationStatus.PENDING;
 
     @Column(name = "public_api_shelter_id", length = 50)
-    private String publicApiShelterId;  // 공공 데이터 api 연동용
+    private String publicApiShelterId; // 공공 데이터 api 연동용
 
     @Column(name = "verified_at")
     private LocalDateTime verifiedAt;
@@ -75,6 +75,7 @@ public class Shelter extends BaseTimeEntity{
     private List<Volunteer> volunteers = new ArrayList<>();
 
     @OneToMany(mappedBy = "shelter")
+    @Builder.Default
     private List<VolunteerRecruitment> volunteerRecruitments = new ArrayList<>();
 
     public void updateVerificationStatus(VerificationStatus status) {
@@ -84,6 +85,5 @@ public class Shelter extends BaseTimeEntity{
             this.verifiedAt = LocalDateTime.now();
         }
     }
-
 
 }

@@ -1,6 +1,6 @@
 spring:
   application:
-    name: antigravity-animal-system
+    name: dnplatform
   profiles:
     active: dev
   servlet:

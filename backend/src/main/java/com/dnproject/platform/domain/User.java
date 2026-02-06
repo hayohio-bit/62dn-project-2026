@@ -28,7 +28,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User extends BaseTimeEntity{
+public class User extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -51,6 +51,7 @@ public class User extends BaseTimeEntity{
     @Builder.Default
     private Role role = Role.USER;
 
+    @Builder.Default
     @OneToMany(mappedBy = "user")
     private List<Volunteer> volunteers = new ArrayList<>();
 
@@ -58,9 +59,8 @@ public class User extends BaseTimeEntity{
     private boolean isTemporaryPassword = false;
 
     // 비즈니스 메소드 : 비밀번호 변경
-    public void updatePassword(String newPassword){
+    public void updatePassword(String newPassword) {
         this.password = newPassword;
     }
 
 }
-
