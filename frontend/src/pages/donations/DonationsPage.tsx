@@ -123,9 +123,10 @@ export default function DonationsPage() {
       await donationApi.donate(formData);
       alert('기부 신청이 완료되었습니다!');
       setShowModal(false);
-    } catch (err: any) {
-      const status = err.response?.status;
-      const message = err.response?.data?.message;
+    } catch (err: unknown) {
+      const ax = err && typeof err === 'object' && 'response' in err ? (err as { response?: { status?: number; data?: { message?: string } } }) : null;
+      const status = ax?.response?.status;
+      const message = ax?.response?.data?.message;
       if (status === 401 || status === 403) {
         const goLogin = window.confirm('로그인이 필요합니다. 로그인 페이지로 이동할까요?');
         if (goLogin) navigate('/login', { state: { from: '/donations' } });

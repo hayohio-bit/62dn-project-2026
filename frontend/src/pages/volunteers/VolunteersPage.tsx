@@ -126,8 +126,9 @@ export default function VolunteersPage() {
       await volunteerApi.apply(formData);
       alert('봉사 신청이 완료되었습니다!');
       setShowModal(false);
-    } catch (err: any) {
-      alert(err.response?.data?.message || '봉사 신청에 실패했습니다.');
+    } catch (err: unknown) {
+      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      alert(msg || '봉사 신청에 실패했습니다.');
     } finally {
       setSubmitting(false);
     }

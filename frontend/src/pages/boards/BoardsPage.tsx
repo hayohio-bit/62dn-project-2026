@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import type { BoardType } from '@/types/entities';
+import type { Board, BoardType } from '@/types/entities';
 import { mockBoards } from '@/data/mockBoards';
 import ListSearch from '@/components/list/ListSearch';
 import Pagination from '@/components/list/Pagination';
@@ -29,6 +29,8 @@ const BOARD_FILTER_TYPES: BoardType[] = ['NOTICE', 'FAQ', 'FREE'];
 
 const PAGE_SIZE_OPTIONS = [10, 15, 20];
 
+const USE_MOCK = true;
+
 export default function BoardsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const type = (searchParams.get('type') as BoardType) || undefined;
@@ -38,10 +40,9 @@ export default function BoardsPage() {
   const [pageSize, setPageSize] = useState(15);
   const [loading, setLoading] = useState(true);
 
-  const USE_MOCK = true;
-  const rawList = useMemo(() => (USE_MOCK ? mockBoards : []), [USE_MOCK]);
+  const rawList = useMemo<Board[]>(() => (USE_MOCK ? mockBoards : []), []);
 
-  const filteredList = useMemo(() => {
+  const filteredList = useMemo<Board[]>(() => {
     let list = type ? rawList.filter((b) => b.type === type) : rawList;
     if (search.trim()) {
       const q = search.trim().toLowerCase();
@@ -53,9 +54,9 @@ export default function BoardsPage() {
       );
     }
     return list;
-  }, [rawList, type, search, USE_MOCK]);
+  }, [rawList, type, search]);
 
-  const paginatedList = useMemo(() => {
+  const paginatedList = useMemo<Board[]>(() => {
     const start = page * pageSize;
     return filteredList.slice(start, start + pageSize);
   }, [filteredList, page, pageSize]);
@@ -124,7 +125,7 @@ export default function BoardsPage() {
             ) : (
               <>
                 <div className="list-card-list">
-                  {paginatedList.map((board) => (
+                  {paginatedList.map((board: Board) => (
                     <Link
                       key={board.id}
                       to={`/boards/${board.id}`}
