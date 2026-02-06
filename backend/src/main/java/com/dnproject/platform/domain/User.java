@@ -52,6 +52,9 @@ public class User extends BaseTimeEntity {
     private Role role = Role.USER;
 
     @Builder.Default
+    private boolean suspended = false;
+
+    @Builder.Default
     @OneToMany(mappedBy = "user")
     private List<Volunteer> volunteers = new ArrayList<>();
 
@@ -61,6 +64,26 @@ public class User extends BaseTimeEntity {
     // 비즈니스 메소드 : 비밀번호 변경
     public void updatePassword(String newPassword) {
         this.password = newPassword;
+    }
+
+    public void updateRole(Role role) {
+        this.role = role;
+    }
+
+    public void setSuspended(boolean suspended) {
+        this.suspended = suspended;
+    }
+
+    public void updateInfo(String name, String phone, String address) {
+        if (name != null && !name.isBlank()) {
+            this.name = name;
+        }
+        if (phone != null) {
+            this.phone = phone;
+        }
+        if (address != null) {
+            this.address = address;
+        }
     }
 
 }

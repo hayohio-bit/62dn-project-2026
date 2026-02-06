@@ -83,10 +83,10 @@ public class VolunteerService {
 
         // 2. 신청 내역의 상태를 변경
         volunteer.updateStatus(status);
-        
+
         // 3. 변경된 상태의 내역을 DB에 저장
         Volunteer updatedVolunteer = volunteerRepository.save(volunteer);
-        
+
         // 4. DB에 저장되어있는 내역을 Dto로 변경해서 리턴
         return VolunteerResponse.from(updatedVolunteer);
     }
@@ -103,5 +103,12 @@ public class VolunteerService {
     public Page<VolunteerRecruitmentResponse> getRecruitmentsByShelter(Long shelterId, Pageable pageable) {
         return recruitmentRepository.findByShelterId(shelterId, pageable)
                 .map(VolunteerRecruitmentResponse::from);
+    }
+
+    // 내 봉사활동 신청 내역 조회
+    @Transactional(readOnly = true)
+    public Page<VolunteerResponse> getMyVolunteers(Long userId, Pageable pageable) {
+        return volunteerRepository.findByUserId(userId, pageable)
+                .map(VolunteerResponse::from);
     }
 }

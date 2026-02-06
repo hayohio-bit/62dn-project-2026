@@ -1,31 +1,23 @@
 package com.dnproject.platform.dto.response;
 
-
-import com.dnproject.platform.domain.Favorite;
-import lombok.AllArgsConstructor;
+import com.dnproject.platform.domain.AnimalFavorite;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
-
 @Getter
-@AllArgsConstructor
 @Builder
-public class FavoriteResponse{
+public class FavoriteResponse {
     private Long id;
-    private Long userId;
     private Long animalId;
     private String animalName;
-    private LocalDateTime createdAt;
+    private String animalImageUrl;
 
-    // Mapping
-    public static FavoriteResponse from(Favorite favorite) {
+    public static FavoriteResponse from(AnimalFavorite favorite) {
         return FavoriteResponse.builder()
                 .id(favorite.getId())
-                .userId(favorite.getUser().getId())
                 .animalId(favorite.getAnimal().getId())
                 .animalName(favorite.getAnimal().getName())
-                .createdAt(favorite.getCreatedAt())
+                .animalImageUrl(favorite.getAnimal().getImageUrl())
                 .build();
     }
 }

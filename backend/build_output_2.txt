@@ -1,0 +1,63 @@
+
+> Task :compileJava FAILED
+D:\spring_boot_project\62dn-project-2026\backend\src\main\java\com\dnproject\platform\controller\AdminAnimalController.java:24: error: method syncFromPublicApi in class AnimalSyncService cannot be applied to given types;
+        animalSyncService.syncFromPublicApi();
+                         ^
+  required: Integer,Integer,String
+  found:    no arguments
+  reason: actual and formal argument lists differ in length
+D:\spring_boot_project\62dn-project-2026\backend\src\main\java\com\dnproject\platform\controller\AdminBoardController.java:21: error: cannot find symbol
+        Page<Object> response = adminBoardService.getAllBoards(pageable);
+                                                 ^
+  symbol:   method getAllBoards(Pageable)
+  location: variable adminBoardService of type AdminBoardService
+D:\spring_boot_project\62dn-project-2026\backend\src\main\java\com\dnproject\platform\controller\AdminBoardController.java:33: error: cannot find symbol
+        Page<Object> response = adminBoardService.getAllComments(pageable);
+                                                 ^
+  symbol:   method getAllComments(Pageable)
+  location: variable adminBoardService of type AdminBoardService
+D:\spring_boot_project\62dn-project-2026\backend\src\main\java\com\dnproject\platform\controller\AdminShelterController.java:25: error: method getVerificationRequests in class AdminShelterService cannot be applied to given types;
+        Page<AdminShelterResponse> response = adminShelterService.getVerificationRequests(status, pageable);
+                                                                 ^
+  required: Pageable
+  found:    VerificationStatus,Pageable
+  reason: actual and formal argument lists differ in length
+4 errors
+
+[Incubating] Problems report is available at: file:///D:/spring_boot_project/62dn-project-2026/backend/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':compileJava'.
+> Compilation failed; see the compiler output below.
+  D:\spring_boot_project\62dn-project-2026\backend\src\main\java\com\dnproject\platform\controller\AdminAnimalController.java:24: error: method syncFromPublicApi in class AnimalSyncService cannot be applied to given types;
+          animalSyncService.syncFromPublicApi();
+                           ^
+    required: Integer,Integer,String
+    found:    no arguments
+    reason: actual and formal argument lists differ in length
+  D:\spring_boot_project\62dn-project-2026\backend\src\main\java\com\dnproject\platform\controller\AdminShelterController.java:25: error: method getVerificationRequests in class AdminShelterService cannot be applied to given types;
+          Page<AdminShelterResponse> response = adminShelterService.getVerificationRequests(status, pageable);
+                                                                   ^
+    required: Pageable
+    found:    VerificationStatus,Pageable
+    reason: actual and formal argument lists differ in length
+  D:\spring_boot_project\62dn-project-2026\backend\src\main\java\com\dnproject\platform\controller\AdminBoardController.java:21: error: cannot find symbol
+          Page<Object> response = adminBoardService.getAllBoards(pageable);
+                                                   ^
+    symbol:   method getAllBoards(Pageable)
+    location: variable adminBoardService of type AdminBoardService
+  D:\spring_boot_project\62dn-project-2026\backend\src\main\java\com\dnproject\platform\controller\AdminBoardController.java:33: error: cannot find symbol
+          Page<Object> response = adminBoardService.getAllComments(pageable);
+                                                   ^
+    symbol:   method getAllComments(Pageable)
+    location: variable adminBoardService of type AdminBoardService
+  4 errors
+
+* Try:
+> Check your code and dependencies to fix the compilation error(s)
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+
+BUILD FAILED in 2s
+1 actionable task: 1 executed

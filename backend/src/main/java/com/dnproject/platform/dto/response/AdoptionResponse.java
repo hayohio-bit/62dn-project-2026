@@ -13,6 +13,7 @@ public class AdoptionResponse {
     private String userName;
     private String animalName;
     private String typeDescription;
+    private String status;
     private String statusDescription;
     private String reason;
     private LocalDateTime createdAt;
@@ -24,6 +25,7 @@ public class AdoptionResponse {
                 .userName(adoption.getUser().getName())
                 .animalName(adoption.getAnimal().getName())
                 .typeDescription(adoption.getType().getDescription())
+                .status(adoption.getStatus().name())
                 .statusDescription(adoption.getStatus().getDescription())
                 .createdAt(adoption.getCreatedAt())
                 .build();

@@ -11,7 +11,6 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-
 @Entity
 @Table(name = "sync_history", indexes = {
         @Index(name = "idx_sync_history_run_at", columnList = "created_at")
@@ -20,7 +19,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class SyncHistory extends BaseTimeEntity{
+public class SyncHistory extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,7 +30,14 @@ public class SyncHistory extends BaseTimeEntity{
 
     private Integer totalCount;
     private Integer successCount;
+    private Integer addedCount;
+    private Integer updatedCount;
+    private Integer deletedCount;
+    private Integer correctedCount;
+
+    private String errorMessage;
+    private Integer daysParam;
+    private String speciesFilter;
 
     private String status;
-
 }

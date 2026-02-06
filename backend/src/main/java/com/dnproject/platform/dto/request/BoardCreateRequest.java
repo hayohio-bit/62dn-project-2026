@@ -3,11 +3,15 @@ package com.dnproject.platform.dto.request;
 import com.dnproject.platform.domain.Board;
 import com.dnproject.platform.domain.User;
 import com.dnproject.platform.domain.constant.BoardType;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class BoardCreateRequest {
     private String title;
     private String content;

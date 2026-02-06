@@ -1,19 +1,15 @@
 package com.dnproject.platform.dto.response;
 
-
 import com.dnproject.platform.domain.Preference;
 import com.dnproject.platform.domain.constant.Size;
 import com.dnproject.platform.domain.constant.Species;
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 @Builder
 public class PreferenceResponse {
-
     private Long id;
-    private Long userId;
     private Species species;
     private Integer minAge;
     private Integer maxAge;
@@ -24,7 +20,6 @@ public class PreferenceResponse {
     public static PreferenceResponse from(Preference preference) {
         return PreferenceResponse.builder()
                 .id(preference.getId())
-                .userId(preference.getUser().getId())
                 .species(preference.getSpecies())
                 .minAge(preference.getMinAge())
                 .maxAge(preference.getMaxAge())

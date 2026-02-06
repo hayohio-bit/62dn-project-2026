@@ -20,4 +20,6 @@ public interface AdoptionRepository extends JpaRepository<Adoption, Long> {
     Page<Adoption> findByShelterIdAndStatus(@Param("shelterId") Long shelterId,
             @Param("status") AdoptionStatus status,
             Pageable pageable);
+
+    long countByStatus(AdoptionStatus status);
 }

@@ -1,12 +1,19 @@
 package com.dnproject.platform.service;
 
 import com.dnproject.platform.domain.Animal;
+import com.dnproject.platform.domain.Preference;
 import com.dnproject.platform.domain.Shelter;
 import com.dnproject.platform.domain.constant.AnimalStatus;
+import com.dnproject.platform.domain.constant.Size;
+import com.dnproject.platform.domain.constant.Species;
 import com.dnproject.platform.dto.request.AnimalCreateRequest;
 import com.dnproject.platform.dto.response.AnimalResponse;
 import com.dnproject.platform.repository.AnimalRepository;
+import com.dnproject.platform.repository.PreferenceRepository;
 import com.dnproject.platform.repository.ShelterRepository;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -21,8 +28,23 @@ public class AnimalService {
 
     private final AnimalRepository animalRepository;
     private final ShelterRepository shelterRepository;
+    private final PreferenceRepository preferenceRepository;
 
-    public Page<AnimalResponse> getAnimals(AnimalStatus status, String species, String breed, Pageable pageable) {
+    public Page<AnimalResponse> getAnimals(AnimalStatus status, String speciesStr, String breed, Pageable pageable) {
+
+        Species species = null;
+        if (speciesStr != null && !speciesStr.isEmpty()) {
+            try {
+                species = Species.valueOf(speciesStr.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                // Ignore invalid species
+            }
+        }
+        if (pageable.getSort().getOrderFor("random") != null) {
+            pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
+                    Sort.by("createdAt").descending());
+        }
+
         return animalRepository.findAnimals(status, species, breed, pageable)
                 .map(AnimalResponse::from);
     }
@@ -76,6 +98,28 @@ public class AnimalService {
 
     public Page<AnimalResponse> getAnimalsByShelter(Long shelterId, Pageable pageable) {
         return animalRepository.findByShelterId(shelterId, pageable)
+                .map(AnimalResponse::from);
+    }
+
+    public Page<AnimalResponse> getRecommendations(Long userId, Pageable pageable) {
+        Preference preference = preferenceRepository.findByUserId(userId).orElse(null);
+
+        if (preference == null) {
+            if (pageable.getSort().getOrderFor("random") != null) {
+                pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
+                        Sort.by("createdAt").descending());
+            }
+            // 선호도 없으면 최신 동물 추천
+            return animalRepository.findAnimals(AnimalStatus.PROTECTED, null, null, pageable)
+                    .map(AnimalResponse::from);
+        }
+
+        return animalRepository.findRecommendedAnimals(
+                preference.getSpecies(),
+                preference.getSize(),
+                preference.getMinAge(),
+                preference.getMaxAge(),
+                pageable)
                 .map(AnimalResponse::from);
     }
 }

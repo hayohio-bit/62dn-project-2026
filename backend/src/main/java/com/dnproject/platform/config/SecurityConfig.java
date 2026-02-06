@@ -50,10 +50,19 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**", "/api/shelters/signup", "/api/shelters/**").permitAll() // 허용 할
-                                                                                                                 // 것
-                        .anyRequest().authenticated() // 나머지는 로그인 필요
-                )
+                        .requestMatchers(
+                                "/api/auth/**",
+                                "/api/shelters/signup",
+                                "/api/shelters/**",
+                                "/api/animals/**",
+                                "/api/boards/**",
+                                "/api/comments/**",
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/h2-console/**")
+                        .permitAll()
+                        .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

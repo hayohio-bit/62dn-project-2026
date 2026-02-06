@@ -3,14 +3,16 @@ package com.dnproject.platform.controller;
 import com.dnproject.platform.domain.constant.AnimalStatus;
 import com.dnproject.platform.dto.request.AnimalCreateRequest;
 import com.dnproject.platform.dto.response.AnimalResponse;
+import com.dnproject.platform.dto.response.ApiResponse;
+import com.dnproject.platform.dto.response.PageResponse;
 import com.dnproject.platform.service.AnimalService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/animals")
@@ -18,53 +20,58 @@ import java.util.Map;
 public class AnimalController {
 
     private final AnimalService animalService;
+    private final com.dnproject.platform.repository.UserRepository userRepository;
 
     @GetMapping
-    public ResponseEntity<Map<String, Object>> getAnimals(
+    public ResponseEntity<ApiResponse<PageResponse<AnimalResponse>>> getAnimals(
             @RequestParam(required = false) AnimalStatus status,
             @RequestParam(required = false) String species,
             @RequestParam(required = false) String breed,
             Pageable pageable) {
         Page<AnimalResponse> animals = animalService.getAnimals(status, species, breed, pageable);
-        return ResponseEntity.ok(Map.of(
-                "data", Map.of(
-                        "content", animals.getContent(),
-                        "totalPages", animals.getTotalPages(),
-                        "totalElements", animals.getTotalElements())));
+        return ResponseEntity.ok(ApiResponse.success(PageResponse.from(animals)));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Map<String, Object>> getAnimal(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<AnimalResponse>> getAnimal(@PathVariable Long id) {
         AnimalResponse animal = animalService.getAnimal(id);
-        return ResponseEntity.ok(Map.of("data", animal));
+        return ResponseEntity.ok(ApiResponse.success(animal));
     }
 
     @PostMapping
-    public ResponseEntity<Map<String, Object>> createAnimal(@RequestBody AnimalCreateRequest request) {
+    public ResponseEntity<ApiResponse<AnimalResponse>> createAnimal(@RequestBody AnimalCreateRequest request) {
         AnimalResponse animal = animalService.createAnimal(request);
-        return ResponseEntity.ok(Map.of("data", animal));
+        return ResponseEntity.ok(ApiResponse.success("동물 정보가 등록되었습니다.", animal));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Map<String, Object>> updateAnimal(@PathVariable Long id,
+    public ResponseEntity<ApiResponse<AnimalResponse>> updateAnimal(@PathVariable Long id,
             @RequestBody AnimalCreateRequest request) {
         AnimalResponse animal = animalService.updateAnimal(id, request);
-        return ResponseEntity.ok(Map.of("data", animal));
+        return ResponseEntity.ok(ApiResponse.success("동물 정보가 수정되었습니다.", animal));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteAnimal(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<Void>> deleteAnimal(@PathVariable Long id) {
         animalService.deleteAnimal(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(ApiResponse.success("동물 정보가 삭제되었습니다.", null));
     }
 
-    @GetMapping("/shelter/{shelterId}")
-    public ResponseEntity<Map<String, Object>> getAnimalsByShelter(@PathVariable Long shelterId, Pageable pageable) {
-        Page<AnimalResponse> animals = animalService.getAnimalsByShelter(shelterId, pageable);
-        return ResponseEntity.ok(Map.of(
-                "data", Map.of(
-                        "content", animals.getContent(),
-                        "totalPages", animals.getTotalPages(),
-                        "totalElements", animals.getTotalElements())));
+    @GetMapping("/recommendations")
+    public ResponseEntity<ApiResponse<PageResponse<AnimalResponse>>> getRecommendations(
+            @AuthenticationPrincipal UserDetails userDetails,
+            Pageable pageable) {
+        Long userId = getUserId(userDetails);
+        Page<AnimalResponse> animals = animalService.getRecommendations(userId, pageable);
+        return ResponseEntity.ok(ApiResponse.success("추천 동물 목록 조회 성공", PageResponse.from(animals)));
+    }
+
+    private Long getUserId(UserDetails userDetails) {
+        if (userDetails == null) {
+            return 1L; // 임시: 테스트용
+        }
+        return userRepository.findByEmail(userDetails.getUsername())
+                .map(user -> user.getId())
+                .orElse(1L);
     }
 }

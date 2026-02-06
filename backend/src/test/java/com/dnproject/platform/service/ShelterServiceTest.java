@@ -25,7 +25,7 @@ class ShelterServiceTest {
     @Test
     @DisplayName("보호소 회원가입 테스트")
     public void shelterSignTest() {
-        //given
+        // given
         ShelterSignupRequest request = ShelterSignupRequest.builder()
                 .email("test@test.com")
                 .password("1234")
@@ -37,22 +37,21 @@ class ShelterServiceTest {
                 .address("강동구 천호동")
                 .build();
 
-        //when
-        ShelterSignupResponse response = shelterService.registerShelter(request, 1L);
+        // when
+        ShelterSignupResponse response = shelterService.registerShelter(request);
 
-        //then
-        log.info("생성된 id : " + response.getId());
+        // then
+        log.info("생성된 id : " + response.getShelterId());
 
-        assertThat(response.getId()).isGreaterThan(0L); // Id가 0보다 높은지 검증
-        assertThat(response.getName()).isEqualTo("test 보호소");
+        assertThat(response.getShelterId()).isGreaterThan(0L); // Id가 0보다 높은지 검증
+        assertThat(response.getShelterName()).isEqualTo("test 보호소");
 
     }
-
 
     @Test
     @DisplayName("보호소 승인 상태 변경 테스트")
     public void verifyShelterTest() {
-        //given
+        // given
         // 1. 회원가입 신청
         ShelterSignupRequest signupRequest = ShelterSignupRequest.builder()
                 .email("test@test.com")
@@ -66,17 +65,17 @@ class ShelterServiceTest {
                 .build();
 
         // 2. 가입처리 등록
-        ShelterSignupResponse signupResponse = shelterService.registerShelter(signupRequest, 1L);
-        Long shelterId = signupResponse.getId();
+        ShelterSignupResponse signupResponse = shelterService.registerShelter(signupRequest);
+        Long shelterId = signupResponse.getShelterId();
 
         // 3. 상태변경 (인증완료 상태로 변경)
         ShelterVerifyRequest verifyRequest = new ShelterVerifyRequest(VerificationStatus.VERIFIED);
 
-        //when
+        // when
         // 승인
         ShelterResponse result = shelterService.verifyShelter(shelterId, verifyRequest);
 
-        //then
+        // then
         assertThat(result.getStatus()).isEqualTo(VerificationStatus.VERIFIED.getDescription()); // 잘 바뀌었나 확인.
         assertThat(result.getVerifiedAt()).isNotNull(); // 승인 시간이 제대로 찍혔는지 확인.
 
