@@ -2,20 +2,22 @@ import { useEffect, useMemo, useState, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthStore } from '@/store/authStore';
-import { adminApi } from '@/api/admin';
+import { adminApi, type RoleFilter, type SyncHistoryItem } from '@/api/admin';
 import { animalApi } from '@/api/animal';
 import { adoptionApi } from '@/api/adoption';
 import { volunteerApi } from '@/api/volunteer';
 import { donationApi } from '@/api/donation';
 import { notificationApi } from '@/api/notification';
-import type { ShelterResponse, NotificationResponse, AnimalListResponse } from '@/types/dto';
+import type { 
+  ShelterResponse, 
+  NotificationResponse, 
+  UserResponse, 
+  BoardResponse,
+  AnimalCreateRequest,
+  VolunteerRecruitmentCreateRequest,
+  DonationRequestCreateRequest
+} from '@/types/dto';
 import type { Adoption, Volunteer, Donation } from '@/types/entities';
-import type { AnimalCreateRequest } from '@/types/dto';
-import type { VolunteerRecruitmentCreateRequest } from '@/types/dto';
-import type { DonationRequestCreateRequest } from '@/types/dto';
-import type { UserResponse } from '@/types/dto';
-import type { BoardResponse } from '@/types/dto';
-import type { RoleFilter, SyncHistoryItem } from '@/api/admin';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 
@@ -219,7 +221,7 @@ export default function AdminDashboardPage() {
       setUsersTotalElements(data?.totalElements ?? 0);
     } catch (e: unknown) {
       const err = e as { response?: { data?: { message?: string }; status?: number } };
-      const msg = err.response?.data?.message ?? err.response?.status === 403 ? '권한이 없습니다.' : '회원 목록을 불러오지 못했습니다.';
+      const msg = err.response?.data?.message ?? (err.response?.status === 403 ? '권한이 없습니다.' : '회원 목록을 불러오지 못했습니다.');
       setUsersError(msg);
       setUsers([]);
     } finally {
@@ -238,7 +240,7 @@ export default function AdminDashboardPage() {
       setBoardsTotalPages(data?.totalPages ?? 0);
     } catch (e: unknown) {
       const err = e as { response?: { data?: { message?: string }; status?: number } };
-      const msg = err.response?.data?.message ?? err.response?.status === 403 ? '권한이 없습니다.' : '게시글 목록을 불러오지 못했습니다.';
+      const msg = err.response?.data?.message ?? (err.response?.status === 403 ? '권한이 없습니다.' : '게시글 목록을 불러오지 못했습니다.');
       setBoardsError(msg);
       setBoards([]);
     } finally {
@@ -300,26 +302,6 @@ export default function AdminDashboardPage() {
       loadApplicationsLog();
     }
   }, [user?.role, superTab, loadApplicationsLog]);
-
-  const loadPendingApplications = useCallback(async () => {
-    setApplicationsLoading(true);
-    try {
-      const [adoptionsRes, volunteersRes, donationsRes] = await Promise.all([
-        adoptionApi.getPendingByShelter(0, 50),
-        volunteerApi.getPendingByShelter(0, 50),
-        donationApi.getPendingByShelter(0, 50),
-      ]);
-      setPendingAdoptions(adoptionsRes?.content ?? []);
-      setPendingVolunteers(volunteersRes?.content ?? []);
-      setPendingDonations(donationsRes?.content ?? []);
-    } catch {
-      setPendingAdoptions([]);
-      setPendingVolunteers([]);
-      setPendingDonations([]);
-    } finally {
-      setApplicationsLoading(false);
-    }
-  }, []);
 
   const handleAdoptionApprove = async (id: number) => {
     setApplicationActionLoading(`adoption-${id}`);
@@ -402,52 +384,97 @@ export default function AdminDashboardPage() {
     }
   };
 
-  useEffect(() => {
-    if (user?.role === 'SUPER_ADMIN' && superTab === 'members') {
-      loadUsers();
-    }
-  }, [user?.role, superTab, usersPage, roleFilter, loadUsers]);
-
-  useEffect(() => {
-    if (user?.role === 'SUPER_ADMIN' && superTab === 'boards') {
-      loadBoards();
-    }
-  }, [user?.role, superTab, boardsPage, boardTypeFilter, loadBoards]);
-
-  useEffect(() => {
-    if (user?.role === 'SUPER_ADMIN' && superTab === 'sync') {
-      loadSyncHistory();
-    }
-  }, [user?.role, superTab, syncHistoryPage, loadSyncHistory]);
-
-  useEffect(() => {
-    if (user?.role === 'SUPER_ADMIN' && superTab === 'applicationsLog') {
-      loadApplicationsLog();
-    }
-  }, [user?.role, superTab, loadApplicationsLog]);
-
-  const loadApplicationsLog = useCallback(async () => {
-    setApplicationsLogLoading(true);
+  const handleVerify = async (id: number, status: 'APPROVED' | 'REJECTED') => {
+    setActionLoading(id);
     try {
-      const [adoptionsRes, volunteersRes, donationsRes] = await Promise.all([
-        adminApi.getAllAdoptions(0, 100),
-        adminApi.getAllVolunteers(0, 100),
-        adminApi.getAllDonations(0, 100),
-      ]);
-      const adoptions = adoptionsRes?.data?.data?.content ?? [];
-      const volunteers = volunteersRes?.data?.data?.content ?? [];
-      const donations = donationsRes?.data?.data?.content ?? [];
-      setAllAdoptions(adoptions);
-      setAllVolunteers(volunteers);
-      setAllDonations(donations);
-    } catch {
-      setAllAdoptions([]);
-      setAllVolunteers([]);
-      setAllDonations([]);
+      await adminApi.verifyShelter(id, { status });
+      setPendingShelters((prev) => prev.filter((s) => s.id !== id));
+    } catch (e) {
+      const msg = (e as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      alert(msg ?? '처리에 실패했습니다.');
     } finally {
-      setApplicationsLogLoading(false);
+      setActionLoading(null);
     }
-  }, []);
+  };
+
+  const handleViewBusinessReg = async (id: number) => {
+    setBusinessRegLoading(id);
+    try {
+      const res = await adminApi.getBusinessRegistrationFile(id);
+      const url = URL.createObjectURL(res.data);
+      window.open(url, '_blank');
+    } catch {
+      alert('사업자등록증을 불러오지 못했습니다.');
+    } finally {
+      setBusinessRegLoading(null);
+    }
+  };
+
+  const handleSetBoardPinned = async (id: number, pinned: boolean) => {
+    setBoardActionLoading(id);
+    try {
+      await adminApi.setBoardPinned(id, pinned);
+      setBoards((prev) => prev.map((b) => (b.id === id ? { ...b, isPinned: pinned } : b)));
+    } catch (e) {
+      const msg = (e as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      alert(msg ?? '고정 상태 변경에 실패했습니다.');
+    } finally {
+      setBoardActionLoading(null);
+    }
+  };
+
+  const handleDeleteBoard = async (id: number) => {
+    if (!confirm('정말 삭제하시겠습니까?')) return;
+    setBoardActionLoading(id);
+    try {
+      await adminApi.deleteBoard(id);
+      setBoards((prev) => prev.filter((b) => b.id !== id));
+    } catch (e) {
+      const msg = (e as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      alert(msg ?? '삭제에 실패했습니다.');
+    } finally {
+      setBoardActionLoading(null);
+    }
+  };
+
+  const handleSyncFromPublicApi = async () => {
+    setSyncLoading(true);
+    setSyncResult(null);
+    try {
+      const res = await adminApi.syncFromPublicApi({ days: 3 });
+      const data = res.data?.data ?? res.data;
+      setSyncResult(`동기화 성공: 추가 ${data.addedCount}건, 수정 ${data.updatedCount}건`);
+      loadSyncHistory();
+    } catch (e) {
+      const msg = (e as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      setSyncResult(`오류: ${msg ?? '동기화 중 문제가 발생했습니다.'}`);
+    } finally {
+      setSyncLoading(false);
+    }
+  };
+
+  const handleSendTestEmail = async () => {
+    setTestEmailLoading(true);
+    setTestEmailResult(null);
+    try {
+      await adminApi.sendTestEmail(testEmailTo);
+      setTestEmailResult({ ok: true, message: '테스트 이메일이 발송되었습니다.' });
+    } catch (e: unknown) {
+      const err = e as { response?: { data?: { message?: string } } };
+      setTestEmailResult({ ok: false, message: err.response?.data?.message ?? '발송에 실패했습니다.' });
+    } finally {
+      setTestEmailLoading(false);
+    }
+  };
+
+  const handleMarkRead = async (id: number) => {
+    try {
+      await notificationApi.markAsRead(id);
+      setNotifications((prev) => prev.map((n) => n.id === id ? { ...n, isRead: true } : n));
+    } catch {
+      alert('읽음 처리에 실패했습니다.');
+    }
+  };
 
   type LogEntry = { type: 'adoption'; item: Adoption } | { type: 'volunteer'; item: Volunteer } | { type: 'donation'; item: Donation };
   const applicationsLogEntries = useMemo<LogEntry[]>(() => {
@@ -473,235 +500,6 @@ export default function AdminDashboardPage() {
     if (type === 'volunteer') return (item as Volunteer).applicantName;
     if (type === 'donation') return (item as Donation).donorName ?? '기부자';
     return '-';
-  };
-
-  const loadMyShelter = useCallback(async () => {
-    setShelterLoading(true);
-    try {
-      const res = await adminApi.getMyShelter();
-      const data = res.data?.data ?? res.data;
-      setMyShelter(data ?? null);
-    } catch {
-      setMyShelter(null);
-    } finally {
-      setShelterLoading(false);
-    }
-  }, []);
-
-  const loadPendingShelters = useCallback(async () => {
-    if (user?.role !== 'SUPER_ADMIN') return;
-    setLoading(true);
-    setError('');
-    try {
-      const res = await adminApi.getShelters('PENDING');
-      const data = res.data?.data ?? res.data;
-      setPendingShelters(Array.isArray(data) ? data : []);
-    } catch (e) {
-      const msg = (e as { response?: { data?: { message?: string } } })?.response?.data?.message;
-      setError(msg ?? '보호소 목록을 불러오지 못했습니다.');
-      setPendingShelters([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [user?.role]);
-
-  const loadNotifications = useCallback(async () => {
-    setNotifLoading(true);
-    try {
-      const data = await notificationApi.getMyList(0, 30);
-      setNotifications(data?.content ?? []);
-    } catch {
-      setNotifications([]);
-    } finally {
-      setNotifLoading(false);
-    }
-  }, []);
-
-  const loadSyncHistory = useCallback(async () => {
-    setSyncHistoryLoading(true);
-    try {
-      const res = await adminApi.getSyncHistory(syncHistoryPage, 20);
-      const payload = res.data?.data ?? res.data;
-      if (payload?.content) {
-        setSyncHistory(payload.content);
-        setSyncHistoryTotalPages(payload.totalPages ?? 0);
-        setSyncHistoryTotalElements(payload.totalElements ?? 0);
-      }
-    } catch {
-      setSyncHistory([]);
-    } finally {
-      setSyncHistoryLoading(false);
-    }
-  }, [syncHistoryPage]);
-
-  const handleSyncFromPublicApi = async () => {
-    setSyncLoading(true);
-    setSyncResult(null);
-    try {
-      const res = await adminApi.syncFromPublicApi({ days: 3 });
-      const data = res.data?.data ?? res.data;
-      const added = data?.addedCount ?? 0;
-      const updated = data?.updatedCount ?? 0;
-      const corrected = data?.statusCorrectedCount ?? 0;
-      const apiKeyOk = data?.apiKeyConfigured !== false;
-      if (!apiKeyOk) {
-        setSyncResult('API 키가 설정되지 않았습니다. backend/.env 에 DATA_API_KEY 를 확인하세요.');
-      } else if (added === 0 && updated === 0 && corrected === 0) {
-        setSyncResult('동기화 완료: 변경 없음 (신규/수정된 데이터 없음)');
-      } else {
-        const parts: string[] = [];
-        if (added > 0) parts.push(`추가 ${added}마리`);
-        if (updated > 0) parts.push(`수정 ${updated}마리`);
-        if (corrected > 0) parts.push(`만료보정 ${corrected}마리`);
-        setSyncResult(`동기화 완료: ${parts.join(', ')}`);
-      }
-      loadSyncHistory();
-      setTimeout(() => setSyncResult(null), 8000);
-    } catch (e: unknown) {
-      const msg = (e as { response?: { data?: { message?: string } } })?.response?.data?.message;
-      setSyncResult(msg ?? '동기화 실패');
-      loadSyncHistory();
-    } finally {
-      setSyncLoading(false);
-    }
-  };
-
-  const handleSendTestEmail = async () => {
-    setTestEmailResult(null);
-    setTestEmailLoading(true);
-    try {
-      const res = await adminApi.sendTestEmail(testEmailTo.trim() || undefined);
-      const msg = res.data?.message ?? res.data?.data ?? '발송 요청이 완료되었습니다.';
-      setTestEmailResult({ ok: true, message: msg });
-    } catch (e: unknown) {
-      const msg = (e as { response?: { data?: { message?: string } } })?.response?.data?.message ?? '테스트 발송에 실패했습니다.';
-      setTestEmailResult({ ok: false, message: msg });
-    } finally {
-      setTestEmailLoading(false);
-    }
-  };
-
-  const handleVerify = async (shelterId: number, status: 'APPROVED' | 'REJECTED') => {
-    setActionLoading(shelterId);
-    try {
-      await adminApi.verifyShelter(shelterId, { status });
-      setPendingShelters((prev) => prev.filter((s) => s.id !== shelterId));
-    } catch (e) {
-      const msg = (e as { response?: { data?: { message?: string } } })?.response?.data?.message;
-      setError(msg ?? '처리 중 오류가 발생했습니다.');
-    } finally {
-      setActionLoading(null);
-    }
-  };
-
-  const handleMarkRead = async (id: number) => {
-    try {
-      await notificationApi.markAsRead(id);
-      setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, isRead: true } : n)));
-    } catch {
-      // ignore
-    }
-  };
-
-  const loadUsers = useCallback(async () => {
-    setUsersError('');
-    setUsersLoading(true);
-    try {
-      const role = roleFilter === '' ? undefined : (roleFilter as RoleFilter);
-      const res = await adminApi.getUsers(usersPage, 20, role);
-      const data = res.data?.data ?? res.data;
-      setUsers(data?.content ?? []);
-      setUsersTotalPages(data?.totalPages ?? 0);
-      setUsersTotalElements(data?.totalElements ?? 0);
-    } catch (e: unknown) {
-      const err = e as { response?: { data?: { message?: string }; status?: number } };
-      const msg = err.response?.data?.message ?? err.response?.status === 403 ? '권한이 없습니다.' : '회원 목록을 불러오지 못했습니다.';
-      setUsersError(msg);
-      setUsers([]);
-    } finally {
-      setUsersLoading(false);
-    }
-  }, [roleFilter, usersPage]);
-
-  const loadBoards = useCallback(async () => {
-    setBoardsError('');
-    setBoardsLoading(true);
-    try {
-      const type = boardTypeFilter === '' ? undefined : boardTypeFilter;
-      const res = await adminApi.getBoards(boardsPage, 20, type);
-      const data = res.data?.data ?? res.data;
-      setBoards(data?.content ?? []);
-      setBoardsTotalPages(data?.totalPages ?? 0);
-    } catch (e: unknown) {
-      const err = e as { response?: { data?: { message?: string }; status?: number } };
-      const msg = err.response?.data?.message ?? err.response?.status === 403 ? '권한이 없습니다.' : '게시글 목록을 불러오지 못했습니다.';
-      setBoardsError(msg);
-      setBoards([]);
-    } finally {
-      setBoardsLoading(false);
-    }
-  }, [boardTypeFilter, boardsPage]);
-
-  const handleSetBoardPinned = async (boardId: number, pinned: boolean) => {
-    setBoardActionLoading(boardId);
-    try {
-      await adminApi.setBoardPinned(boardId, pinned);
-      setBoards((prev) => prev.map((b) => (b.id === boardId ? { ...b, isPinned: pinned } : b)));
-    } catch {
-      // ignore
-    } finally {
-      setBoardActionLoading(null);
-    }
-  };
-
-  const handleDeleteBoard = async (boardId: number) => {
-    setBoardActionLoading(boardId);
-    try {
-      await adminApi.deleteBoard(boardId);
-      setBoards((prev) => prev.filter((b) => b.id !== boardId));
-    } catch {
-      // ignore
-    } finally {
-      setBoardActionLoading(null);
-    }
-  };
-
-  const handleViewBusinessReg = async (shelterId: number) => {
-    setError('');
-    setBusinessRegLoading(shelterId);
-    try {
-      const res = await adminApi.getBusinessRegistrationFile(shelterId);
-      const blob = res.data as Blob;
-      // 서버가 JSON 에러를 blob으로 보낸 경우(Content-Type이 application/json이면) 표시 불가
-      const contentType = (res.headers as Record<string, string>)['content-type'] || '';
-      if (blob.type?.includes('application/json') || contentType.includes('application/json')) {
-        const text = await blob.text();
-        const json = JSON.parse(text);
-        const msg = json?.message ?? json?.data?.message ?? '서버에서 오류가 반환되었습니다.';
-        setError(msg);
-        setBusinessRegLoading(null);
-        return;
-      }
-      const url = URL.createObjectURL(blob);
-      window.open(url, '_blank', 'noopener,noreferrer');
-      setTimeout(() => URL.revokeObjectURL(url), 60000);
-    } catch (err: unknown) {
-      const e = err as { response?: { data?: Blob; status?: number }; message?: string };
-      if (e.response?.data instanceof Blob) {
-        try {
-          const text = await (e.response.data as Blob).text();
-          const json = JSON.parse(text);
-          const msg = json?.message ?? json?.data?.message;
-          setError(msg ?? '사업자등록증 파일을 불러올 수 없습니다.');
-        } catch {
-          setError(e.response?.status === 404 ? '등록된 사업자등록증이 없거나 파일을 찾을 수 없습니다.' : '사업자등록증 파일을 불러올 수 없습니다.');
-        }
-      } else {
-        setError(e.message ?? '사업자등록증 파일을 불러올 수 없습니다.');
-      }
-    } finally {
-      setBusinessRegLoading(null);
-    }
   };
 
   if (!isAuthenticated || !user) return null;
@@ -1509,7 +1307,7 @@ function ShelterAnimalForm({
   setLoading,
   onSuccess,
   success,
-  onClearSuccess: _onClearSuccess,
+  onClearSuccess,
 }: {
   shelterId: number;
   loading: boolean;
@@ -1549,6 +1347,7 @@ function ShelterAnimalForm({
       };
       await animalApi.create(payload);
       onSuccess();
+      onClearSuccess();
       setBreed(''); setName(''); setAge(''); setDescription(''); setImageUrl('');
     } catch (e: unknown) {
       const msg = (e as { response?: { data?: { message?: string } } })?.response?.data?.message;
@@ -1625,7 +1424,7 @@ function ShelterVolunteerForm({
   setLoading,
   onSuccess,
   success,
-  onClearSuccess: _onClearSuccess,
+  onClearSuccess,
 }: {
   shelterId: number;
   loading: boolean;
@@ -1658,6 +1457,7 @@ function ShelterVolunteerForm({
       };
       await volunteerApi.createRecruitment(payload);
       onSuccess();
+      onClearSuccess();
       setTitle(''); setContent(''); setDeadline('');
     } catch (e: unknown) {
       const msg = (e as { response?: { data?: { message?: string } } })?.response?.data?.message;
@@ -1706,7 +1506,7 @@ function ShelterDonationForm({
   setLoading,
   onSuccess,
   success,
-  onClearSuccess: _onClearSuccess,
+  onClearSuccess,
 }: {
   shelterId: number;
   loading: boolean;
@@ -1741,6 +1541,7 @@ function ShelterDonationForm({
       };
       await donationApi.createRequest(payload);
       onSuccess();
+      onClearSuccess();
       setTitle(''); setContent(''); setItemCategory(''); setDeadline('');
     } catch (e: unknown) {
       const msg = (e as { response?: { data?: { message?: string } } })?.response?.data?.message;

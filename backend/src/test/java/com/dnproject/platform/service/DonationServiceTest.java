@@ -34,11 +34,16 @@ import static org.junit.jupiter.api.Assertions.*;
 @Transactional
 class DonationServiceTest {
 
-    @Autowired private DonationService donationService;
-    @Autowired private DonationRepository donationRepository;
-    @Autowired private DonationRequestRepository donationRequestRepository;
-    @Autowired private UserRepository userRepository;
-    @Autowired private ShelterRepository shelterRepository;
+    @Autowired
+    private DonationService donationService;
+    @Autowired
+    private DonationRepository donationRepository;
+    @Autowired
+    private DonationRequestRepository donationRequestRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private ShelterRepository shelterRepository;
 
     private User savedUser;
     private Shelter savedShelter;
@@ -66,8 +71,8 @@ class DonationServiceTest {
 
     @Test
     @DisplayName("물품 후원 신청시 수량 업데이트 테스트")
-//    @Rollback(false) // 롤백을 하지 않고 커밋함
-    void applyItemDonationTest(){
+    // @Rollback(false) // 롤백을 하지 않고 커밋함
+    void applyItemDonationTest() {
         // given: 기부 요청 공고 생성 (목표 100개)
         DonationRequest requestNotice = donationRequestRepository.save(DonationRequest.builder()
                 .shelter(savedShelter)
@@ -103,7 +108,6 @@ class DonationServiceTest {
         assertEquals(10, updatedNotice.getCurrentQuantity());
         assertEquals(RequestStatus.OPEN, updatedNotice.getStatus());
     }
-
 
     @Test
     @DisplayName("기부 요청 수량을 모두 채우면 공고 상태가 CLOSED로 변경되어야 한다")
@@ -145,13 +149,15 @@ class DonationServiceTest {
     @Test
     @DisplayName("일반회원의 기부 내역 조회 테스트")
     void getMyDonationsTest() {
-        //given
-        Long userId = 15L;
+        // given
+        // 먼저 기부 내역을 하나 생성함
+        applyItemDonationTest();
+        Long userId = savedUser.getId();
 
-        //when
+        // when
         List<DonationResponse> myDonations = donationService.getMyDonations(userId);
 
-        //then
+        // then
         assertFalse(myDonations.isEmpty(), "기부 내역이 DB에 없습니다.");
 
         myDonations.forEach(i -> log.info("기부 내역 리스트" + i));
@@ -159,14 +165,16 @@ class DonationServiceTest {
 
     @Test
     @DisplayName("보호소에 들어온 기부 목록 조회 테스트")
-    void getShelterDonationsTest(){
-        //given
-        Long shelterId = 15L;
+    void getShelterDonationsTest() {
+        // given
+        // 먼저 기부 내역을 하나 생성함
+        applyItemDonationTest();
+        Long shelterId = savedShelter.getId();
 
-        //when
+        // when
         List<DonationResponse> shelterDonations = donationService.getShelterDonations(shelterId);
 
-        //then
+        // then
         assertFalse(shelterDonations.isEmpty(), "내역이 없습니다.");
 
         shelterDonations.forEach(i -> log.info("기부 목록 내역 : " + i));
@@ -176,7 +184,9 @@ class DonationServiceTest {
     @DisplayName("기부 상태 변경 테스트: PENDING -> RECEIVED")
     void updateDonationStatusTest() {
         // Given
-        Long userId = 15L;
+        // 먼저 기부 내역을 하나 생성함
+        applyItemDonationTest();
+        Long userId = savedUser.getId();
 
         List<DonationResponse> myDonations = donationService.getMyDonations(userId);
         assertFalse(myDonations.isEmpty(), "테스트를 위한 기부 데이터가 DB에 있어야 합니다.");
@@ -191,6 +201,6 @@ class DonationServiceTest {
         Donation updatedEntity = donationRepository.findById(targetId).orElseThrow();
         assertEquals(newStatus, updatedEntity.getStatus());
 
-        log.info("상태 변경 완료 : ID " + targetId + updatedEntity.getStatus() + "변경 완료");
+        log.info("상태 변경 완료 : ID " + targetId + " " + updatedEntity.getStatus() + "변경 완료");
     }
 }

@@ -7,6 +7,7 @@ import axiosInstance from "@/lib/axios";
 import type {
   PreferenceRequest,
   PreferenceResponse,
+  AnimalListResponse,
   ApiResponse,
 } from "@/types/dto";
 
