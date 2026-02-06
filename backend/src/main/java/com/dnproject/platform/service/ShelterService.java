@@ -10,6 +10,8 @@ import com.dnproject.platform.dto.response.ShelterSignupResponse;
 import com.dnproject.platform.repository.ShelterRepository;
 import com.dnproject.platform.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,11 +25,12 @@ public class ShelterService {
     private final BCryptPasswordEncoder passwordEncoder;
 
     // 보호소 회원 가입.
-    public ShelterSignupResponse registerShelter(ShelterSignupRequest request, Long userId) {
+    @Transactional
+    public ShelterSignupResponse registerShelter(ShelterSignupRequest request) {
         if (shelterRepository.existsByBusinessRegistrationNumber(request.getBusinessRegistrationNumber())) {
             throw new IllegalArgumentException("이미 등록된 사업자 번호입니다.");
         }
-        if (shelterRepository.existsByEmail((request.getEmail()))) {
+        if (userRepository.existsByEmail((request.getEmail()))) {
             throw new IllegalArgumentException("이미 사용 중인 이메일 입니다.");
         }
 
@@ -44,8 +47,12 @@ public class ShelterService {
         Shelter shelter = request.toEntity(manager);
         Shelter savedShelter = shelterRepository.save(shelter);
 
-
         return ShelterSignupResponse.from(savedShelter);
+    }
+
+    public Page<ShelterResponse> getShelters(Pageable pageable) {
+        return shelterRepository.findAll(pageable)
+                .map(ShelterResponse::from);
     }
 
     // 보호소 상세 조회.

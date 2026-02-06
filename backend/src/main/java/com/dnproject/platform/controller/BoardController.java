@@ -3,18 +3,21 @@ package com.dnproject.platform.controller;
 import com.dnproject.platform.domain.constant.BoardType;
 import com.dnproject.platform.dto.request.BoardCreateRequest;
 import com.dnproject.platform.dto.request.CommentCreateRequest;
+import com.dnproject.platform.dto.response.ApiResponse;
 import com.dnproject.platform.dto.response.BoardResponse;
 import com.dnproject.platform.dto.response.CommentResponse;
+import com.dnproject.platform.dto.response.PageResponse;
 import com.dnproject.platform.service.BoardService;
 import com.dnproject.platform.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/boards")
@@ -23,59 +26,72 @@ public class BoardController {
 
     private final BoardService boardService;
     private final CommentService commentService;
+    private final com.dnproject.platform.repository.UserRepository userRepository;
 
     @GetMapping
-    public ResponseEntity<Map<String, Object>> getBoards(
+    public ResponseEntity<ApiResponse<PageResponse<BoardResponse>>> getBoards(
             @RequestParam(required = false) BoardType type,
             Pageable pageable) {
-        Page<BoardResponse> boards = boardService.getBoards(type, pageable);
-        return ResponseEntity.ok(Map.of(
-                "data", Map.of(
-                        "content", boards.getContent(),
-                        "totalPages", boards.getTotalPages(),
-                        "totalElements", boards.getTotalElements())));
+        Page<BoardResponse> response = boardService.getBoards(type, pageable);
+        return ResponseEntity.ok(ApiResponse.success(PageResponse.from(response)));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Map<String, Object>> getBoard(@PathVariable Long id) {
-        BoardResponse board = boardService.getBoard(id);
-        return ResponseEntity.ok(Map.of("data", board));
+    public ResponseEntity<ApiResponse<BoardResponse>> getBoard(@PathVariable Long id) {
+        BoardResponse response = boardService.getBoard(id);
+        return ResponseEntity.ok(ApiResponse.success(response));
     }
 
     @PostMapping
-    public ResponseEntity<Map<String, Object>> createBoard(@RequestBody BoardCreateRequest request) {
-        Long userId = 1L; // Mock userId
+    public ResponseEntity<ApiResponse<BoardResponse>> createBoard(
+            @RequestBody BoardCreateRequest request,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        Long userId = getUserId(userDetails);
         BoardResponse response = boardService.createBoard(request, userId);
-        return ResponseEntity.ok(Map.of("data", response));
+        return ResponseEntity.ok(ApiResponse.success("게시글이 작성되었습니다.", response));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Map<String, Object>> updateBoard(@PathVariable Long id,
-            @RequestBody BoardCreateRequest request) {
-        Long userId = 1L; // Mock userId
+    public ResponseEntity<ApiResponse<BoardResponse>> updateBoard(
+            @PathVariable Long id,
+            @RequestBody BoardCreateRequest request,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        Long userId = getUserId(userDetails);
         BoardResponse response = boardService.updateBoard(id, request, userId);
-        return ResponseEntity.ok(Map.of("data", response));
+        return ResponseEntity.ok(ApiResponse.success("게시글이 수정되었습니다.", response));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteBoard(@PathVariable Long id) {
-        Long userId = 1L; // Mock userId
+    public ResponseEntity<ApiResponse<Void>> deleteBoard(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        Long userId = getUserId(userDetails);
         boardService.deleteBoard(id, userId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(ApiResponse.success("게시글이 삭제되었습니다.", null));
     }
 
-    @PostMapping("/{boardId}/comments")
-    public ResponseEntity<Map<String, Object>> addComment(
-            @PathVariable Long boardId,
-            @RequestBody CommentCreateRequest request) {
-        Long userId = 1L; // Mock userId
-        CommentResponse response = commentService.addComment(boardId, request, userId);
-        return ResponseEntity.ok(Map.of("data", response));
+    @GetMapping("/{id}/comments")
+    public ResponseEntity<ApiResponse<List<CommentResponse>>> getComments(@PathVariable Long id) {
+        List<CommentResponse> response = commentService.getComments(id);
+        return ResponseEntity.ok(ApiResponse.success(response));
     }
 
-    @GetMapping("/{boardId}/comments")
-    public ResponseEntity<Map<String, Object>> getComments(@PathVariable Long boardId) {
-        List<CommentResponse> comments = commentService.getComments(boardId);
-        return ResponseEntity.ok(Map.of("data", comments));
+    @PostMapping("/{id}/comments")
+    public ResponseEntity<ApiResponse<CommentResponse>> createComment(
+            @PathVariable Long id,
+            @RequestBody CommentCreateRequest request,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        Long userId = getUserId(userDetails);
+        CommentResponse response = commentService.addComment(id, request, userId);
+        return ResponseEntity.ok(ApiResponse.success("댓글이 작성되었습니다.", response));
+    }
+
+    private Long getUserId(UserDetails userDetails) {
+        if (userDetails == null) {
+            return 1L;
+        }
+        return userRepository.findByEmail(userDetails.getUsername())
+                .map(user -> user.getId())
+                .orElse(1L);
     }
 }

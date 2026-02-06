@@ -1,4 +1,7 @@
 package com.dnproject.platform.repository;
 
-public interface SyncHistoryRepository {
+import com.dnproject.platform.domain.SyncHistory;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface SyncHistoryRepository extends JpaRepository<SyncHistory, Long> {
 }

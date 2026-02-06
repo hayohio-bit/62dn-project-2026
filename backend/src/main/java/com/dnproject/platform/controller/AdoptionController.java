@@ -1,12 +1,17 @@
 package com.dnproject.platform.controller;
 
+import com.dnproject.platform.domain.Shelter;
 import com.dnproject.platform.dto.request.AdoptionRequest;
 import com.dnproject.platform.dto.response.AdoptionResponse;
+import com.dnproject.platform.dto.response.ApiResponse;
+import com.dnproject.platform.dto.response.PageResponse;
 import com.dnproject.platform.service.AdoptionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -17,57 +22,84 @@ import java.util.Map;
 public class AdoptionController {
 
     private final AdoptionService adoptionService;
+    private final com.dnproject.platform.repository.UserRepository userRepository;
+    private final com.dnproject.platform.repository.ShelterRepository shelterRepository;
 
     @PostMapping
-    public ResponseEntity<Map<String, Object>> apply(@RequestBody AdoptionRequest request) {
-        // 실제 운영에선 SecurityContextHolder에서 userId를 가져와야 함. 일단 1번 유저로 가정하거나 파라미터로 받음.
-        // 프론트엔드 요청 구조에 맞춰 구현.
-        Long userId = 1L;
+    public ResponseEntity<ApiResponse<AdoptionResponse>> apply(
+            @RequestBody AdoptionRequest request,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        Long userId = getUserId(userDetails);
         AdoptionResponse response = adoptionService.apply(request, userId);
-        return ResponseEntity.ok(Map.of("data", response));
+        return ResponseEntity.ok(ApiResponse.success("입양 신청이 완료되었습니다.", response));
     }
 
     @GetMapping("/my")
-    public ResponseEntity<Map<String, Object>> getMyList(Pageable pageable) {
-        Long userId = 1L;
-        Page<AdoptionResponse> list = adoptionService.getMyList(userId, pageable);
-        return ResponseEntity.ok(Map.of(
-                "data", Map.of(
-                        "content", list.getContent(),
-                        "totalPages", list.getTotalPages(),
-                        "totalElements", list.getTotalElements())));
+    public ResponseEntity<ApiResponse<PageResponse<AdoptionResponse>>> getMyAdoptions(
+            @AuthenticationPrincipal UserDetails userDetails,
+            Pageable pageable) {
+        Long userId = getUserId(userDetails);
+        Page<AdoptionResponse> response = adoptionService.getMyList(userId, pageable);
+        return ResponseEntity.ok(ApiResponse.success(PageResponse.from(response)));
     }
 
     @PatchMapping("/{id}/cancel")
-    public ResponseEntity<Map<String, Object>> cancel(@PathVariable Long id) {
-        Long userId = 1L;
+    public ResponseEntity<ApiResponse<AdoptionResponse>> cancel(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        Long userId = getUserId(userDetails);
         AdoptionResponse response = adoptionService.cancel(id, userId);
-        return ResponseEntity.ok(Map.of("data", response));
+        return ResponseEntity.ok(ApiResponse.success("입양 신청이 취소되었습니다.", response));
     }
 
     @GetMapping("/animal/{animalId}")
-    public ResponseEntity<Map<String, Object>> getByAnimalId(@PathVariable Long animalId, Pageable pageable) {
-        Page<AdoptionResponse> list = adoptionService.getByAnimalId(animalId, pageable);
-        return ResponseEntity.ok(Map.of("data", list));
+    public ResponseEntity<ApiResponse<PageResponse<AdoptionResponse>>> getByAnimalId(
+            @PathVariable Long animalId,
+            Pageable pageable) {
+        Page<AdoptionResponse> response = adoptionService.getByAnimalId(animalId, pageable);
+        return ResponseEntity.ok(ApiResponse.success(PageResponse.from(response)));
     }
 
     @GetMapping("/shelter/pending")
-    public ResponseEntity<Map<String, Object>> getPendingByShelter(@RequestParam Long shelterId, Pageable pageable) {
-        Page<AdoptionResponse> list = adoptionService.getPendingByShelter(shelterId, pageable);
-        return ResponseEntity.ok(Map.of("data", list));
+    public ResponseEntity<ApiResponse<PageResponse<AdoptionResponse>>> getPendingByShelter(
+            @AuthenticationPrincipal UserDetails userDetails,
+            Pageable pageable) {
+        Long shelterId = getShelterId(userDetails);
+        Page<AdoptionResponse> response = adoptionService.getPendingByShelter(shelterId, pageable);
+        return ResponseEntity.ok(ApiResponse.success(PageResponse.from(response)));
     }
 
     @PutMapping("/{id}/approve")
-    public ResponseEntity<Map<String, Object>> approve(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<AdoptionResponse>> approve(@PathVariable Long id) {
         AdoptionResponse response = adoptionService.approve(id);
-        return ResponseEntity.ok(Map.of("data", response));
+        return ResponseEntity.ok(ApiResponse.success("입양 신청이 승인되었습니다.", response));
     }
 
     @PutMapping("/{id}/reject")
-    public ResponseEntity<Map<String, Object>> reject(@PathVariable Long id,
+    public ResponseEntity<ApiResponse<AdoptionResponse>> reject(
+            @PathVariable Long id,
             @RequestBody(required = false) Map<String, String> body) {
-        String rejectReason = (body != null) ? body.get("rejectReason") : null;
+        String rejectReason = body != null ? body.get("rejectReason") : null;
         AdoptionResponse response = adoptionService.reject(id, rejectReason);
-        return ResponseEntity.ok(Map.of("data", response));
+        return ResponseEntity.ok(ApiResponse.success("입양 신청이 반려되었습니다.", response));
+    }
+
+    private Long getUserId(UserDetails userDetails) {
+        if (userDetails == null) {
+            return 1L; // 임시: 테스트용
+        }
+        return userRepository.findByEmail(userDetails.getUsername())
+                .map(user -> user.getId())
+                .orElse(1L);
+    }
+
+    private Long getShelterId(UserDetails userDetails) {
+        if (userDetails == null) {
+            return 1L; // 임시: 테스트용
+        }
+        return userRepository.findByEmail(userDetails.getUsername())
+                .flatMap(user -> shelterRepository.findByManagerId(user.getId()))
+                .map(Shelter::getId)
+                .orElse(1L);
     }
 }

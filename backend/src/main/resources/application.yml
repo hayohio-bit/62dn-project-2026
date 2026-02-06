@@ -8,15 +8,42 @@ spring:
       max-file-size: 10MB
       max-request-size: 10MB
 
+# 공공데이터포털 구조동물조회 API (API-Quick-Reference.md 참고)
 animal:
   upload-path: d:/dn-project/uploads
+  api:
+    base-url: ${GOV_API_BASE_URL:https://apis.data.go.kr/1543061}
+    # serviceKey: GET 요청 시 URL 인코딩 필요 시 GOV_API_KEY_ENCODED 사용
+    service-key: ${GOV_API_KEY:${ANIMAL_API_KEY:yMP6lpEQqhP8+loxfdMTCQFf6L7lis9mWT2UtOUFTyo+bG0ZGCpAN3VwGQj0tC217bLATyoRw7+dLMQ5mfC1Wg==}}
+    service-key-encoded: ${GOV_API_KEY_ENCODED:}
+    params:
+      bgnde: ${GOV_API_BGNDE:20260101}
+      endde: ${GOV_API_ENDDE:20260206}
+      state: notice
+      pageNo: 1
+      numOfRows: 100
+      _type: json
 
 resend:
-  api-key: ${RESEND_API_KEY:}
+  api-key: ${RESEND_API_KEY:re_QAy5siEB_mwAjLdDrcXh3f6L3AnfSFarJ}
+  from-email: noreply@dn-platform.com
+  from-name: DN Platform
+
+kakao:
+  rest-api-key: ${KAKAO_REST_API_KEY:abe5b23bb7cbeb9f0f77760d4f742d7f}
+  javascript-key: ${KAKAO_JAVASCRIPT_KEY:bb97221a6d16600ec42f6e1b12d68ed3}
+  admin-key: ${KAKAO_ADMIN_KEY:b4d55266c81e1d7170d2cf9d6b2b19db}
+
+api:
+  config:
+    timeout: ${API_CALL_TIMEOUT_SECONDS:30}
+    retry-count: ${API_RETRY_COUNT:3}
+    daily-limit: ${API_DAILY_LIMIT:10000}
 
 jwt:
   secret: ${JWT_SECRET:secretkeysecretkeysecretkeysecretkeysecretkeysecretkeysecretkey}
   expiration: 86400000 # 24 hours
+  refresh-expiration: 604800000 # 7 days
 
 logging:
   level:
