@@ -15,6 +15,8 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Slf4j
@@ -51,6 +53,8 @@ public class PublicApiService {
     @Value("${animal.api.params._type:json}")
     private String defaultType;
 
+    private final com.fasterxml.jackson.databind.ObjectMapper objectMapper;
+
     public List<AnimalItem> getAnimalList(String bgnde, String endde, String upkind, String uprCd, String orgCd,
             String careRegNo, int pageNo, int numOfRows) {
 
@@ -63,31 +67,49 @@ public class PublicApiService {
                 ? serviceKeyEncoded
                 : serviceKey;
 
-        URI uri = UriComponentsBuilder.fromUriString(baseUrl + ABANDONMENT_PATH)
-                .queryParam("serviceKey", effectiveServiceKey)
-                .queryParam("bgnde", effectiveBgnde)
-                .queryParam("endde", effectiveEndde)
-                .queryParam("upkind", upkind)
-                .queryParam("upr_cd", uprCd)
-                .queryParam("org_cd", orgCd)
-                .queryParam("care_reg_no", careRegNo)
-                .queryParam("state", defaultState)
-                .queryParam("pageNo", pageNo)
-                .queryParam("numOfRows", effectiveNumOfRows)
-                .queryParam("_type", defaultType)
-                .build()
-                .toUri();
-
-        log.debug("Calling Public API: {}", uri);
-
         try {
-            ResponseEntity<PublicApiResponse<AnimalItem>> response = restTemplate.exchange(
+            String encodedServiceKey = URLEncoder.encode(effectiveServiceKey, StandardCharsets.UTF_8);
+
+            URI uri = UriComponentsBuilder.fromUriString(baseUrl + ABANDONMENT_PATH)
+                    .queryParam("serviceKey", encodedServiceKey)
+                    .queryParam("bgnde", effectiveBgnde)
+                    .queryParam("endde", effectiveEndde)
+                    .queryParam("upkind", upkind)
+                    .queryParam("upr_cd", uprCd)
+                    .queryParam("org_cd", orgCd)
+                    .queryParam("care_reg_no", careRegNo)
+                    .queryParam("state", defaultState)
+                    .queryParam("pageNo", pageNo)
+                    .queryParam("numOfRows", effectiveNumOfRows)
+                    .queryParam("_type", defaultType)
+                    .build(true)
+                    .toUri();
+
+            log.info("Calling Public API: {}", uri);
+
+            ResponseEntity<String> responseEntity = restTemplate.exchange(
                     uri,
                     HttpMethod.GET,
                     null,
-                    new ParameterizedTypeReference<PublicApiResponse<AnimalItem>>() {
+                    String.class);
+            String rawResponse = responseEntity.getBody();
+            log.info("======== RAW API RESPONSE START ========");
+            log.info(rawResponse);
+            log.info("======== RAW API RESPONSE END ========");
+
+            PublicApiResponse<AnimalItem> apiResponse = objectMapper.readValue(rawResponse,
+                    new com.fasterxml.jackson.core.type.TypeReference<PublicApiResponse<AnimalItem>>() {
                     });
-            return extractItems(response);
+            return extractItems(new ResponseEntity<>(apiResponse, org.springframework.http.HttpStatus.OK));
+        } catch (org.springframework.web.client.HttpStatusCodeException e) {
+            log.error("Error calling Public API: {}", e.getMessage());
+            try {
+                java.nio.file.Files.writeString(java.nio.file.Paths.get("error_response.txt"),
+                        e.getResponseBodyAsString(), java.nio.charset.StandardCharsets.UTF_8);
+            } catch (Exception ex) {
+                log.error("Failed to write error response to file", ex);
+            }
+            return List.of();
         } catch (Exception e) {
             log.error("Error calling Public API: {}", e.getMessage());
             return List.of();
@@ -96,15 +118,17 @@ public class PublicApiService {
 
     public List<ShelterItem> getShelterList(String uprCd, String orgCd) {
         String key = (serviceKeyEncoded != null && !serviceKeyEncoded.isEmpty()) ? serviceKeyEncoded : serviceKey;
-        URI uri = UriComponentsBuilder.fromUriString(baseUrl + "/animalShelterSrvc_v2/shelterInfo_v2")
-                .queryParam("serviceKey", key)
-                .queryParam("upr_cd", uprCd)
-                .queryParam("org_cd", orgCd)
-                .queryParam("_type", "json")
-                .build(true)
-                .toUri();
 
         try {
+            String encodedKey = URLEncoder.encode(key, StandardCharsets.UTF_8);
+            URI uri = UriComponentsBuilder.fromUriString(baseUrl + "/animalShelterSrvc_v2/shelterInfo_v2")
+                    .queryParam("serviceKey", encodedKey)
+                    .queryParam("upr_cd", uprCd)
+                    .queryParam("org_cd", orgCd)
+                    .queryParam("_type", "json")
+                    .build(true)
+                    .toUri();
+
             ResponseEntity<PublicApiResponse<ShelterItem>> response = restTemplate.exchange(
                     uri,
                     HttpMethod.GET,
@@ -120,14 +144,16 @@ public class PublicApiService {
 
     public List<KindItem> getKindList(String upKindCd) {
         String key = (serviceKeyEncoded != null && !serviceKeyEncoded.isEmpty()) ? serviceKeyEncoded : serviceKey;
-        URI uri = UriComponentsBuilder.fromUriString(baseUrl + "/abandonmentPublicService_v2/kind_v2")
-                .queryParam("serviceKey", key)
-                .queryParam("up_kind_cd", upKindCd)
-                .queryParam("_type", "json")
-                .build(true)
-                .toUri();
 
         try {
+            String encodedKey = URLEncoder.encode(key, StandardCharsets.UTF_8);
+            URI uri = UriComponentsBuilder.fromUriString(baseUrl + "/abandonmentPublicService_v2/kind_v2")
+                    .queryParam("serviceKey", encodedKey)
+                    .queryParam("up_kind_cd", upKindCd)
+                    .queryParam("_type", "json")
+                    .build(true)
+                    .toUri();
+
             ResponseEntity<PublicApiResponse<KindItem>> response = restTemplate.exchange(
                     uri,
                     HttpMethod.GET,
