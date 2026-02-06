@@ -19,9 +19,9 @@ public class AdminAnimalController {
 
     @PostMapping("/sync")
     public ResponseEntity<ApiResponse<Void>> syncAnimals(
-            @RequestParam(required = false, defaultValue = "7") Integer days,
-            @RequestParam(required = false, defaultValue = "1") Integer maxPages,
-            @RequestParam(required = false) String species) {
+            @RequestParam(name = "days", required = false, defaultValue = "7") Integer days,
+            @RequestParam(name = "maxPages", required = false, defaultValue = "1") Integer maxPages,
+            @RequestParam(name = "species", required = false) String species) {
         animalSyncService.syncFromPublicApi(days, maxPages, species);
         return ResponseEntity.ok(ApiResponse.success("동물 데이터 동기화가 시작되었습니다.", null));
     }
