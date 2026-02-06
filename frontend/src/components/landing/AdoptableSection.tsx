@@ -6,6 +6,7 @@ import { animalApi, favoriteApi } from '@/api';
 import { useAuthStore } from '@/store/authStore';
 import FavoriteButton from '@/components/animals/FavoriteButton';
 import type { Animal } from '@/types/entities';
+import { formatAge } from '@/utils/formatters';
 
 const speciesLabels: Record<string, string> = {
   DOG: '강아지',
@@ -87,7 +88,7 @@ export default function AdoptableSection() {
                 <div className="landing-pet-card-body">
                   <p className="landing-pet-card-name">{animal.name}</p>
                   <p className="landing-pet-card-meta">
-                    {speciesLabels[animal.species]} · {animal.age}세 · {sizeLabels[animal.size]}
+                    {speciesLabels[animal.species]} · {formatAge(animal.age)} · {sizeLabels[animal.size]}
                   </p>
                   <p className="landing-pet-card-story">
                     {animal.description || `${animal.breed} · ${animal.shelterName}`}

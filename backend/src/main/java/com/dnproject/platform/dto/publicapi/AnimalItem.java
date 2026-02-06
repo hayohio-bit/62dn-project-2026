@@ -15,6 +15,7 @@ public class AnimalItem {
     private String noticeNo; // 공고번호
     private String noticeSdt; // 공고시작일
     private String noticeEdt; // 공고종료일
+    @com.fasterxml.jackson.annotation.JsonAlias("popfile1")
     private String popfile; // image
     private String processState; // 상태 (보호중, 종료(입양) 등)
     private String sexCd; // 성별 (M, F, Q)
@@ -23,6 +24,7 @@ public class AnimalItem {
     private String careNm; // 보호소이름
     private String careTel; // 보호소전화번호
     private String careAddr; // 보호소주소
+    private String careRegNo; // 보호소 고유번호 (ID)
     private String orgNm; // 시군구명
     private String chargeNm; // 담당자
     private String officetel; // 담당자연락처

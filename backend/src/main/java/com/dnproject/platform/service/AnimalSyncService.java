@@ -32,7 +32,6 @@ public class AnimalSyncService {
     private final ShelterRepository shelterRepository;
     private final SyncHistoryRepository syncHistoryRepository;
 
-    @Transactional
     public void syncFromPublicApi(Integer days, Integer maxPages, String species) {
         String bgnde = LocalDate.now().minusDays(days == null ? 7 : days)
                 .format(DateTimeFormatter.ofPattern("yyyyMMdd"));
@@ -43,7 +42,6 @@ public class AnimalSyncService {
         syncAnimals(bgnde, endde, upkind, days, species);
     }
 
-    @Transactional
     public void syncAnimals(String bgnde, String endde, String upkind, Integer daysParam, String speciesFilter) {
         log.info("Starting animal synchronization: {} to {}, kind: {}", bgnde, endde, upkind);
 
@@ -59,16 +57,28 @@ public class AnimalSyncService {
 
         for (AnimalItem item : items) {
             try {
-                Shelter shelter = shelterRepository.findByPublicApiShelterId(item.getCareNm())
+                // Shelter lookup logic: 1. By Public API ID (careRegNo), 2. By Name (careNm)
+                Shelter shelter = shelterRepository.findByPublicApiShelterId(item.getCareRegNo())
                         .orElseGet(() -> shelterRepository.findAll().stream()
                                 .filter(s -> s.getName().equals(item.getCareNm()))
                                 .findFirst()
-                                .orElse(defaultShelter));
+                                .orElse(null));
 
                 if (shelter == null) {
-                    log.warn("Shelter not found and no default shelter available. Skipping animal: {}",
-                            item.getDesertionNo());
-                    continue;
+                    log.info("Creating new shelter: {}", item.getCareNm());
+                    shelter = Shelter.builder()
+                            .name(item.getCareNm())
+                            .address(item.getCareAddr())
+                            .phone(item.getCareTel())
+                            .managerName(item.getChargeNm() != null ? item.getChargeNm() : "공공담당자")
+                            .managerPhone(item.getOfficetel() != null ? item.getOfficetel() : item.getCareTel())
+                            .email("shelter_"
+                                    + (item.getCareRegNo() != null ? item.getCareRegNo() : System.currentTimeMillis())
+                                    + "@public.api")
+                            .verificationStatus(com.dnproject.platform.domain.constant.VerificationStatus.VERIFIED)
+                            .publicApiShelterId(item.getCareRegNo() != null ? item.getCareRegNo() : item.getCareNm())
+                            .build();
+                    shelter = shelterRepository.save(shelter);
                 }
 
                 Optional<Animal> animalOpt = animalRepository.findByPublicApiAnimalId(item.getDesertionNo());

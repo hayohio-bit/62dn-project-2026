@@ -16,8 +16,9 @@ import java.util.List;
         @Index(name = "idx_shelters_verification", columnList = "verification_status")
 })
 @Getter
+@Setter
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @Builder
 public class Shelter extends BaseTimeEntity {
 

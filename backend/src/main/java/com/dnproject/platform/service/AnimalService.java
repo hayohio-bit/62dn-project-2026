@@ -30,22 +30,32 @@ public class AnimalService {
     private final ShelterRepository shelterRepository;
     private final PreferenceRepository preferenceRepository;
 
-    public Page<AnimalResponse> getAnimals(AnimalStatus status, String speciesStr, String breed, Pageable pageable) {
-
+    public Page<AnimalResponse> getAnimals(AnimalStatus status, String speciesStr, String sizeStr, String region,
+            String sigungu, String search, Pageable pageable) {
         Species species = null;
         if (speciesStr != null && !speciesStr.isEmpty()) {
             try {
                 species = Species.valueOf(speciesStr.toUpperCase());
             } catch (IllegalArgumentException e) {
-                // Ignore invalid species
+                // Ignore
             }
         }
+
+        Size size = null;
+        if (sizeStr != null && !sizeStr.isEmpty()) {
+            try {
+                size = Size.valueOf(sizeStr.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                // Ignore
+            }
+        }
+
         if (pageable.getSort().getOrderFor("random") != null) {
             pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
                     Sort.by("createdAt").descending());
         }
 
-        return animalRepository.findAnimals(status, species, breed, pageable)
+        return animalRepository.findAnimals(status, species, size, region, sigungu, search, pageable)
                 .map(AnimalResponse::from);
     }
 
@@ -110,7 +120,7 @@ public class AnimalService {
                         Sort.by("createdAt").descending());
             }
             // 선호도 없으면 최신 동물 추천
-            return animalRepository.findAnimals(AnimalStatus.PROTECTED, null, null, pageable)
+            return animalRepository.findAnimals(AnimalStatus.PROTECTED, null, null, null, null, null, pageable)
                     .map(AnimalResponse::from);
         }
 

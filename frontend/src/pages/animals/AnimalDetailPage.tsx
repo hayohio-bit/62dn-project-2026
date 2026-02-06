@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { animalApi, favoriteApi } from '@/api';
 import { useAuthStore } from '@/store/authStore';
 import type { Animal } from '@/types/entities';
+import { formatAge } from '@/utils/formatters';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import KakaoMap from '@/components/map/KakaoMap';
@@ -125,7 +126,7 @@ export default function AnimalDetailPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 mb-6 text-sm">
                     <p><strong>종류</strong> {speciesLabels[animal.species]}</p>
                     <p><strong>품종</strong> {animal.breed ?? '미상'}</p>
-                    <p><strong>나이</strong> {animal.age != null ? `${animal.age}세` : '미상'}</p>
+                    <p><strong>나이</strong> {formatAge(animal.age)}</p>
                     <p><strong>성별</strong> {genderLabels[animal.gender] ?? '미상'}</p>
                     <p><strong>크기</strong> {sizeLabels[animal.size] ?? '미상'}</p>
                     <p><strong>중성화</strong> {animal.neutered ? '완료' : '미완료'}</p>
