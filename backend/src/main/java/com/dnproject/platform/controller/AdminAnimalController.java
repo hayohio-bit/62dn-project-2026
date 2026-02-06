@@ -3,6 +3,7 @@ package com.dnproject.platform.controller;
 import com.dnproject.platform.dto.response.ApiResponse;
 import com.dnproject.platform.dto.response.PageResponse;
 import com.dnproject.platform.dto.response.SyncHistoryResponse;
+import com.dnproject.platform.dto.response.SyncResultResponse;
 import com.dnproject.platform.service.AnimalSyncService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -17,13 +18,13 @@ public class AdminAnimalController {
 
     private final AnimalSyncService animalSyncService;
 
-    @PostMapping("/sync")
-    public ResponseEntity<ApiResponse<Void>> syncAnimals(
+    @PostMapping("/sync-from-public-api")
+    public ResponseEntity<ApiResponse<SyncResultResponse>> syncAnimals(
             @RequestParam(name = "days", required = false, defaultValue = "7") Integer days,
             @RequestParam(name = "maxPages", required = false, defaultValue = "1") Integer maxPages,
             @RequestParam(name = "species", required = false) String species) {
-        animalSyncService.syncFromPublicApi(days, maxPages, species);
-        return ResponseEntity.ok(ApiResponse.success("동물 데이터 동기화가 시작되었습니다.", null));
+        SyncResultResponse result = animalSyncService.syncFromPublicApi(days, maxPages, species);
+        return ResponseEntity.ok(ApiResponse.success("동물 데이터 동기화가 완료되었습니다.", result));
     }
 
     @GetMapping("/sync-history")

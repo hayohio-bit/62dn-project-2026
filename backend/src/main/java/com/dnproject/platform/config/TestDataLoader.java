@@ -44,7 +44,7 @@ public class TestDataLoader implements CommandLineRunner {
                 .password(passwordEncoder.encode("admin123"))
                 .name("관리자")
                 .phone("010-1234-5678")
-                .role(Role.ADMIN)
+                .role(Role.SUPER_ADMIN)
                 .build();
         userRepository.save(admin);
         System.out.println("DEBUG: Admin user created");

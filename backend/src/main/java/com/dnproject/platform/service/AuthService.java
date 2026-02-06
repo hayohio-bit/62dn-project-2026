@@ -109,11 +109,10 @@ public class AuthService {
         String refreshToken = jwtProvider.createRefreshToken(user.getEmail(), user.getRole().name());
 
         return TokenResponse.builder()
-                .grantType("Bearer")
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
-                .email(user.getEmail())
-                .role(user.getRole().name())
+                .expiresIn(86400000L) // 24 hours
+                .user(UserResponse.from(user))
                 .build();
     }
 
@@ -136,11 +135,10 @@ public class AuthService {
         String newRefreshToken = jwtProvider.createRefreshToken(user.getEmail(), user.getRole().name());
 
         return TokenResponse.builder()
-                .grantType("Bearer")
                 .accessToken(newAccessToken)
                 .refreshToken(newRefreshToken)
-                .email(user.getEmail())
-                .role(user.getRole().name())
+                .expiresIn(86400000L) // 24 hours
+                .user(UserResponse.from(user))
                 .build();
     }
 

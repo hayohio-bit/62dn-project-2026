@@ -8,7 +8,9 @@ public class AnimalItem {
     private String filename; // thumbnail 이미지
     private String happenDt; // 접수일 (YYYYMMDD)
     private String happenPlace; // 발견장소
-    private String kindCd; // 품종 ([개] 믹스견 등)
+    private String kindCd; // 품종 코드 (API v2: 숫자 코드)
+    private String upKindNm; // 종류명 (API v2: 개, 고양이 등)
+    private String kindFullNm; // 종류+품종 전체 명칭 (API v2: [개] 믹스견 등)
     private String colorCd; // 색상
     private String age; // 나이 (2023(년생) 등)
     private String weight; // 체중 (0.5(Kg) 등)

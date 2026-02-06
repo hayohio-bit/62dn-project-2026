@@ -6,22 +6,21 @@ import lombok.Getter;
 @Getter
 @Builder
 public class TokenResponse {
-    private String grantType;
     private String accessToken;
     private String refreshToken;
-
-    private String email;
-    private String role;
+    private Long expiresIn;
+    private UserResponse user;
 
     public static TokenResponse of(
-            String grantType, String accessToken,
-            String refreshToken, String email, String role) {
+            String accessToken,
+            String refreshToken,
+            Long expiresIn,
+            UserResponse user) {
         return TokenResponse.builder()
-                .grantType(grantType)
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
-                .email(email)
-                .role(role)
+                .expiresIn(expiresIn)
+                .user(user)
                 .build();
     }
 }
