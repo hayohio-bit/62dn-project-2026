@@ -1,3 +1,5 @@
+[![git ](https://img.shields.io/badge/git-Developer_Onboarding_One_Click_Setup_Guide-111827?style=for-the-badge&logo=git&logoColor=white)](https://hayohio-bit.github.io/62dn-project-2026/dev-env-setup-guide)
+
 # 🐶 유기동물 입양/임보 매칭 플랫폼 (62dn-project-2026)
 
 이 프로젝트는 유기동물과 새로운 가족을 연결해주는 입양/임보 매칭 플랫폼입니다. 사용자 맞춤형 추천 시스템을 통해 유기동물 입양 및 임시 보호 활성화를 목표로 합니다.
