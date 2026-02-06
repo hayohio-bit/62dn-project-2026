@@ -18,10 +18,18 @@ public interface AnimalRepository extends JpaRepository<Animal, Long> {
         @Query("SELECT a FROM Animal a " +
                         "WHERE (:status IS NULL OR a.status = :status) " +
                         "AND (:species IS NULL OR a.species = :species) " +
-                        "AND (:breed IS NULL OR a.breed LIKE %:breed%)")
+                        "AND (:size IS NULL OR a.size = :size) " +
+                        "AND (:region IS NULL OR a.orgName LIKE CONCAT(:region, '%')) " +
+                        "AND (:sigungu IS NULL OR a.orgName LIKE CONCAT('%', :sigungu, '%')) " +
+                        "AND (:search IS NULL OR a.breed LIKE CONCAT('%', :search, '%') " +
+                        "OR a.name LIKE CONCAT('%', :search, '%') " +
+                        "OR a.shelter.name LIKE CONCAT('%', :search, '%'))")
         Page<Animal> findAnimals(@Param("status") AnimalStatus status,
                         @Param("species") Species species,
-                        @Param("breed") String breed,
+                        @Param("size") Size size,
+                        @Param("region") String region,
+                        @Param("sigungu") String sigungu,
+                        @Param("search") String search,
                         Pageable pageable);
 
         Page<Animal> findByShelterId(Long shelterId, Pageable pageable);

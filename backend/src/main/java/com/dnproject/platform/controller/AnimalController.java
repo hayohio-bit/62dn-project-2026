@@ -26,9 +26,13 @@ public class AnimalController {
     public ResponseEntity<ApiResponse<PageResponse<AnimalResponse>>> getAnimals(
             @RequestParam(required = false) AnimalStatus status,
             @RequestParam(required = false) String species,
-            @RequestParam(required = false) String breed,
+            @RequestParam(required = false, name = "animalSize") String animalSize,
+            @RequestParam(required = false) String region,
+            @RequestParam(required = false) String sigungu,
+            @RequestParam(required = false) String search,
             Pageable pageable) {
-        Page<AnimalResponse> animals = animalService.getAnimals(status, species, breed, pageable);
+        Page<AnimalResponse> animals = animalService.getAnimals(status, species, animalSize, region, sigungu, search,
+                pageable);
         return ResponseEntity.ok(ApiResponse.success(PageResponse.from(animals)));
     }
 

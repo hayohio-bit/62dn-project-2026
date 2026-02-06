@@ -8,6 +8,7 @@ import type { PreferenceRequest } from '@/types/dto';
 import ListSearch from '@/components/list/ListSearch';
 import Pagination from '@/components/list/Pagination';
 import FilterBar from '@/components/list/FilterBar';
+import { formatAge } from '@/utils/formatters';
 import PreferenceModal from '@/components/animals/PreferenceModal';
 import FavoriteButton from '@/components/animals/FavoriteButton';
 import Header from '@/components/layout/Header';
@@ -193,22 +194,20 @@ export default function AnimalsPage() {
             <div className="flex justify-center gap-2 mb-6">
               <button
                 type="button"
-                className={`px-6 py-2 rounded-full font-semibold transition ${
-                  viewMode === 'all'
-                    ? 'bg-green-600 text-white'
-                    : 'bg-white border border-gray-300 text-gray-700 hover:border-green-600 hover:text-green-600'
-                }`}
+                className={`px-6 py-2 rounded-full font-semibold transition ${viewMode === 'all'
+                  ? 'bg-green-600 text-white'
+                  : 'bg-white border border-gray-300 text-gray-700 hover:border-green-600 hover:text-green-600'
+                  }`}
                 onClick={() => setViewMode('all')}
               >
                 전체
               </button>
               <button
                 type="button"
-                className={`px-6 py-2 rounded-full font-semibold transition ${
-                  viewMode === 'recommended'
-                    ? 'bg-green-600 text-white'
-                    : 'bg-white border border-gray-300 text-gray-700 hover:border-green-600 hover:text-green-600'
-                }`}
+                className={`px-6 py-2 rounded-full font-semibold transition ${viewMode === 'recommended'
+                  ? 'bg-green-600 text-white'
+                  : 'bg-white border border-gray-300 text-gray-700 hover:border-green-600 hover:text-green-600'
+                  }`}
                 onClick={() => {
                   if (!preference) {
                     setShowPreferenceModal(true);
@@ -293,16 +292,16 @@ export default function AnimalsPage() {
                     // 시/도 선택 시 우측에 시/군/구 드롭다운 표시
                     ...(region
                       ? [
-                          {
-                            label: '시/군/구',
-                            options: SIGUNGU_BY_SIDO[region] ?? [{ value: '', label: '전체' }],
-                            value: sigungu,
-                            onChange: (v: string) => {
-                              setSigungu(v);
-                              setPage(0);
-                            },
+                        {
+                          label: '시/군/구',
+                          options: SIGUNGU_BY_SIDO[region] ?? [{ value: '', label: '전체' }],
+                          value: sigungu,
+                          onChange: (v: string) => {
+                            setSigungu(v);
+                            setPage(0);
                           },
-                        ]
+                        },
+                      ]
                       : []),
                   ]}
                   onReset={() => {
@@ -397,7 +396,7 @@ export default function AnimalsPage() {
                           <div className="landing-pet-card-body">
                             <p className="landing-pet-card-name">{animal.name}</p>
                             <p className="landing-pet-card-meta">
-                              {speciesLabels[animal.species] ?? ''} · {animal.age != null ? `${animal.age}세` : '나이미상'} · {sizeLabels[animal.size] ?? '크기미상'} · {genderLabels[animal.gender] ?? '성별미상'}
+                              {speciesLabels[animal.species] ?? ''} · {formatAge(animal.age)} · {sizeLabels[animal.size] ?? '크기미상'} · {genderLabels[animal.gender] ?? '성별미상'}
                             </p>
                             <p className="landing-pet-card-story">
                               {animal.breed ?? '품종미상'} · {animal.neutered ? '중성화 완료' : '미중성화'}
