@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum AnimalStatus {
     PROTECTED("보호 중"),
+    FOSTERING("임시보호 중"),
     ADOPTED("입양 완료"),
     EUTHANIZED("안락사"),
     NATURAL_DEATH("자연사"),

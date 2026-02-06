@@ -39,7 +39,7 @@ public class ShelterService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .name(request.getManagerName())
                 .phone(request.getManagerPhone())
-                .role(Role.MANAGER)
+                .role(Role.SHELTER_ADMIN)
                 .build();
 
         userRepository.save(manager);

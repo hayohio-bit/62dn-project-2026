@@ -105,9 +105,11 @@ class AnimalServiceTest {
                                 .build());
 
                 // when
-                Page<AnimalResponse> dogs = animalService.getAnimals(AnimalStatus.PROTECTED, "DOG", null,
+                Page<AnimalResponse> dogs = animalService.getAnimals(AnimalStatus.PROTECTED, "DOG", null, null, null,
+                                null,
                                 PageRequest.of(0, 10));
-                Page<AnimalResponse> cats = animalService.getAnimals(AnimalStatus.PROTECTED, "CAT", null,
+                Page<AnimalResponse> cats = animalService.getAnimals(AnimalStatus.PROTECTED, "CAT", null, null, null,
+                                null,
                                 PageRequest.of(0, 10));
 
                 // then
