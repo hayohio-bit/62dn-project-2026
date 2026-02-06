@@ -1,5 +1,6 @@
 package com.dnproject.platform.domain;
 
+import com.dnproject.platform.domain.constant.AnimalStatus;
 import com.dnproject.platform.domain.constant.Size;
 import com.dnproject.platform.domain.constant.Species;
 import jakarta.persistence.*;
@@ -21,89 +22,94 @@ import java.util.List;
         @Index(name = "idx_animals_shelter", columnList = "shelter_id"),
         @Index(name = "idx_animals_public_api_id", columnList = "public_api_animal_id")
 })
-@Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
-public class Animal extends BaseTimeEntity {  // auditing 상속
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class Animal extends BaseTimeEntity { // auditing 상속
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;  // PK, 자동 증가
+    private Long id; // PK, 자동 증가
 
-    @ManyToOne(fetch = FetchType.LAZY)  // 보호소 소속, 지연 로딩
+    @ManyToOne(fetch = FetchType.LAZY) // 보호소 소속, 지연 로딩
     @JoinColumn(name = "shelter_id", nullable = false)
-    private Shelter shelter;  // FK: shelter_id
+    private Shelter shelter; // FK: shelter_id
 
     @Column(length = 50)
-    private String publicApiAnimalId;  // 공공 API 고유 ID, 동기화 키
+    private String publicApiAnimalId; // 공공 API 고유 ID, 동기화 키
 
     @Column(length = 100)
-    private String orgName;  // 보호기관명
+    private String orgName; // 보호기관명
 
     @Column(length = 50)
-    private String chargeName;  // 담당자명
+    private String chargeName; // 담당자명
 
     @Column(length = 30)
-    private String chargePhone;  // 담당자 연락처
+    private String chargePhone; // 담당자 연락처
 
     @Enumerated(EnumType.STRING)
     @Column(length = 10, nullable = false)
-    private Species species;  // 종류: DOG, CAT
+    private Species species; // 종류: DOG, CAT
 
     @Column(length = 50)
-    private String breed;  // 품종
+    private String breed; // 품종
 
     @Column(length = 50)
-    private String name;  // 동물명
+    private String name; // 동물명
 
-    private Integer age;  // 나이 (개월)
+    private Integer age; // 나이 (개월)
 
     @Column(length = 10)
-    private String gender;  // 성별: M, F
+    private String gender; // 성별: M, F
 
     @Enumerated(EnumType.STRING)
     @Column(length = 10)
-    private Size size;  // 크기: S, M, L
+    private Size size; // 크기: S, M, L
 
     @Column(precision = 5, scale = 2)
-    private BigDecimal weight;  // 무게 (kg)
+    private BigDecimal weight; // 무게 (kg)
 
     @Column(columnDefinition = "TEXT")
-    private String description;  // 상세 설명
+    private String description; // 상세 설명
 
     @Column(length = 100)
-    private String temperament;  // 성격 (AI 매칭 키워드: 활발, 온순 등)
+    private String temperament; // 성격 (AI 매칭 키워드: 활발, 온순 등)
 
     @Column(length = 255)
-    private String healthStatus;  // 건강상태
+    private String healthStatus; // 건강상태
 
+    @Builder.Default
     @Column(columnDefinition = "BOOLEAN DEFAULT FALSE")
-    private Boolean neutered = false;  // 중성화 여부
+    private Boolean neutered = false; // 중성화 여부
 
+    @Builder.Default
     @Column(columnDefinition = "BOOLEAN DEFAULT FALSE")
-    private Boolean vaccinated = false;  // 예방접종 여부
+    private Boolean vaccinated = false; // 예방접종 여부
 
     @Column(length = 500)
-    private String imageUrl;  // 대표 이미지 URL (S3)
+    private String imageUrl; // 대표 이미지 URL (S3)
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(length = 20, nullable = false)
-    private AnimalStatus status = AnimalStatus.PROTECTED;  // 상태: PROTECTED, ADOPTED 등
+    private AnimalStatus status = AnimalStatus.PROTECTED; // 상태: PROTECTED, ADOPTED 등
 
-    private LocalDate registerDate;  // 접수일
+    private LocalDate registerDate; // 접수일
 
     // 1:N 관계: 입양 신청
+    @Builder.Default
     @OneToMany(mappedBy = "animal", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Adoption> adoptions = new ArrayList<>();
 
     // 1:N 관계: 동물 이미지
+    @Builder.Default
     @OneToMany(mappedBy = "animal", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AnimalImage> images = new ArrayList<>();
 
     // 1:N 관계: 즐겨찾기
+    @Builder.Default
     @OneToMany(mappedBy = "animal", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AnimalFavorite> favorites = new ArrayList<>();
-
-    // Enum 정의
-    public enum AnimalStatus {
-        PROTECTED, ADOPTED, FOSTERED, TRANSFERRED
-    }
 }

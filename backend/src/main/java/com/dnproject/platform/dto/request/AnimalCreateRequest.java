@@ -2,6 +2,7 @@ package com.dnproject.platform.dto.request;
 
 import com.dnproject.platform.domain.Animal;
 import com.dnproject.platform.domain.Shelter;
+import com.dnproject.platform.domain.constant.AnimalStatus;
 import com.dnproject.platform.domain.constant.Size;
 import com.dnproject.platform.domain.constant.Species;
 import lombok.*;
@@ -55,7 +56,7 @@ public class AnimalCreateRequest {
                 .neutered(this.neutered != null ? this.neutered : false)
                 .vaccinated(this.vaccinated != null ? this.vaccinated : false)
                 .imageUrl(this.imageUrl)
-                .status(Animal.AnimalStatus.PROTECTED) // 초기 상태값 설정
+                .status(AnimalStatus.PROTECTED) // 초기 상태값 설정
                 .registerDate(this.registerDate)
                 .build();
     }
